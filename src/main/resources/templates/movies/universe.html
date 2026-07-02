@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title th:text="${directorName + ' Universe | FrameCut'}">Director Universe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --red: #e50914;
+      --text: #f0ece0;
+      --muted: rgba(240,236,224,0.5);
+    }
+    body {
+      margin: 0; padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Barlow', sans-serif;
+      overflow: hidden; /* We'll use custom scrolling */
+    }
+    
+    /* Background Canvas */
+    .universe-canvas {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-behavior: smooth;
+      background: radial-gradient(circle at 10% 50%, rgba(229, 9, 20, 0.1) 0%, #0a0a0a 50%);
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    .universe-canvas::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* SVG Lines Container */
+    #svg-layer {
+      position: absolute;
+      top: 0; left: 0;
+      width: 5000px;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Content Wrapper */
+    .universe-content {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 100px;
+      padding: 0 10vw;
+      z-index: 10;
+      height: 100%;
+    }
+
+    /* Director Node */
+    .director-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 400px;
+      flex-shrink: 0;
+      animation: float 6s ease-in-out infinite;
+    }
+    .director-img-wrapper {
+      position: relative;
+      width: 300px; height: 450px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(229, 9, 20, 0.3);
+      border: 2px solid rgba(229, 9, 20, 0.5);
+    }
+    .director-img-wrapper img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .director-info {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+    .director-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 60px;
+      line-height: 1;
+      margin: 0;
+      letter-spacing: 0.05em;
+      background: linear-gradient(to bottom, #fff, #999);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .director-label {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--red);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-top: 0.5rem;
+    }
+
+    /* Timeline Columns */
+    .timeline-column {
+      display: flex;
+      flex-direction: column;
+      gap: 150px;
+      flex-shrink: 0;
+    }
+
+    /* Node Cards */
+    .node-card {
+      position: relative;
+      border-radius: 12px;
+      background: rgba(20,20,20,0.8);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 1rem;
+      width: 280px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
+    }
+    .node-card:hover {
+      transform: translateY(-10px) scale(1.05);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      border-color: rgba(255,255,255,0.3);
+      z-index: 20;
+    }
+    .node-card img {
+      width: 80px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 6px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+    .node-card.actor-node img {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+    }
+    .node-info {
+      flex: 1;
+      overflow: hidden;
+    }
+    .node-title {
+      font-size: 18px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 0.25rem;
+    }
+    .node-meta {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+
+    /* Close Button */
+    .close-btn {
+      position: fixed;
+      top: 30px; left: 40px;
+      z-index: 999;
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.3s;
+    }
+    .close-btn:hover { color: var(--red); }
+    
+    /* Loading overlay */
+    #loading {
+      position: fixed;
+      top:0; left:0; width:100vw; height:100vh;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 40px;
+      letter-spacing: 0.1em;
+      transition: opacity 0.5s;
+    }
+    .loading-dots::after {
+      content: '.';
+      animation: dots 1.5s steps(5, end) infinite;
+    }
+    @keyframes dots {
+      0%, 20% { color: rgba(255,255,255,0); text-shadow: .25em 0 0 rgba(255,255,255,0), .5em 0 0 rgba(255,255,255,0); }
+      40% { color: white; text-shadow: .25em 0 0 rgba(255,255,255,0), .5em 0 0 rgba(255,255,255,0); }
+      60% { text-shadow: .25em 0 0 white, .5em 0 0 rgba(255,255,255,0); }
+      80%, 100% { text-shadow: .25em 0 0 white, .5em 0 0 white; }
+    }
+    
+    /* Custom dark slim scrollbar for actor modal */
+    #modal-content-box::-webkit-scrollbar {
+      width: 6px;
+    }
+    #modal-content-box::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+    }
+    #modal-content-box::-webkit-scrollbar-thumb {
+      background: rgba(229, 9, 20, 0.4);
+      border-radius: 10px;
+      transition: background 0.3s;
+    }
+    #modal-content-box::-webkit-scrollbar-thumb:hover {
+      background: rgba(229, 9, 20, 0.7);
+    }
+  </style>
+</head>
+<body>
+
+  <a href="javascript:history.back()" class="close-btn">
+    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Back
+  </a>
+
+  <div id="loading">Loading Cinematic Universe<span class="loading-dots"></span></div>
+
+  <div class="universe-canvas" id="canvas">
+    <div style="position:fixed;top:30px;right:40px;z-index:9999;display:flex;gap:10px;">
+      <div style="position:relative">
+        <input type="text" id="director-search" placeholder="Search another director..." autocomplete="off" style="background:rgba(20,20,20,0.8);border:1px solid rgba(255,255,255,0.2);color:white;padding:10px 15px;border-radius:20px;outline:none;font-family:'Barlow',sans-serif;width:250px;backdrop-filter:blur(10px);" onkeydown="if(event.key==='Enter') searchDirector()">
+        <div class="autocomplete-results" id="dir-autocomplete-results" style="left:0;right:0;width:100%;top:100%;margin-top:5px;border-radius:12px;overflow:hidden;text-align:left;position:absolute;z-index:9999"></div>
+      </div>
+      <button onclick="searchDirector()" style="background:var(--red);color:white;border:none;border-radius:20px;padding:10px 20px;cursor:pointer;font-weight:700;font-family:'Barlow',sans-serif;">Search</button>
+    </div>
+    
+    <svg id="svg-layer"></svg>
+    <div class="universe-content" id="content">
+      <!-- Injected via JS -->
+    </div>
+  </div>
+  
+  <!-- ACTOR MODAL (Reused from detail.html) -->
+  <div id="actor-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s">
+    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);" onclick="closeActorModal()"></div>
+    <div style="position:relative;background:rgba(26,24,20,0.85);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;width:90%;max-width:800px;max-height:85vh;overflow-y:auto;display:flex;flex-direction:column;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);transform:translateY(20px);transition:transform 0.3s" id="modal-content-box">
+      <button onclick="closeActorModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:white;font-size:24px;cursor:pointer;z-index:10">&times;</button>
+      <div id="actor-modal-body" style="padding:2.5rem;display:flex;gap:2.5rem;flex-wrap:wrap;color:white"></div>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    const directorName = /*[[${directorName}]]*/ 'Christopher Nolan';
+
+    function searchDirector() {
+      const val = document.getElementById('director-search').value.trim();
+      if(val) {
+        window.location.href = '/universe?director=' + encodeURIComponent(val);
+      }
+    }
+
+    // Live director search / autocomplete
+    (function() {
+      const input = document.getElementById('director-search');
+      const results = document.getElementById('dir-autocomplete-results');
+      if (!input || !results) return;
+
+      let debounceTimer;
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      input.addEventListener('input', () => {
+        const q = input.value.trim();
+        clearTimeout(debounceTimer);
+
+        if (q.length < 2) {
+          results.classList.remove('show');
+          results.innerHTML = '';
+          return;
+        }
+
+        debounceTimer = setTimeout(async () => {
+          try {
+            const res = await fetch(`/api/search/directors?q=${encodeURIComponent(q)}`);
+            const data = await res.json();
+
+            if (!data.length) {
+              results.classList.remove('show');
+              return;
+            }
+
+            results.innerHTML = data.map((item, i) => `
+              <a href="/universe?director=${encodeURIComponent(item.name)}" class="autocomplete-item" style="animation-delay:${i*0.05}s">
+                <img src="${item.profilePath ? 'https://image.tmdb.org/t/p/w185' + item.profilePath : '/images/no-poster.jpg'}" alt="${item.name}" onerror="this.src='/images/no-poster.jpg'">
+                <div class="autocomplete-item-info">
+                  <div class="autocomplete-item-title">${escapeHtml(item.name)}</div>
+                  <div class="autocomplete-item-meta">Director</div>
+                </div>
+              </a>
+            `).join('');
+
+            results.classList.add('show');
+          } catch (e) {
+            console.error('Director Autocomplete error:', e);
+          }
+        }, 300);
+      });
+
+      // Enter key
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && input.value.trim()) {
+          searchDirector();
+        }
+        if (e.key === 'Escape') {
+          results.classList.remove('show');
+          input.blur();
+        }
+      });
+
+      // Close on outside click
+      document.addEventListener('click', e => {
+        if (!input.contains(e.target) && !results.contains(e.target)) {
+          results.classList.remove('show');
+        }
+      });
+    })();
+
+    fetch('/api/universe/director?name=' + encodeURIComponent(directorName))
+      .then(r => r.json())
+      .then(data => {
+        if(!data || !data.director) {
+          document.getElementById('loading').innerHTML = 'Universe not found.';
+          return;
+        }
+        buildUniverse(data);
+      });
+
+    function buildUniverse(data) {
+      const content = document.getElementById('content');
+      
+      // 1. Director Node
+      const dirImg = data.director.profile_path ? 'https://image.tmdb.org/t/p/h632' + data.director.profile_path : '/images/no-poster.jpg';
+      const dirNode = document.createElement('div');
+      dirNode.className = 'director-node';
+      dirNode.id = 'node-director';
+      dirNode.innerHTML = `
+        <div class="director-img-wrapper"><img src="${dirImg}"></div>
+        <div class="director-info">
+          <h1 class="director-name">${data.director.name}</h1>
+          <div class="director-label">The Visionary</div>
+        </div>
+      `;
+      content.appendChild(dirNode);
+
+      // 2. Timeline Columns (Movies & Actors)
+      // We will alternate columns: Column 1 (Movie, Actor, Movie), Column 2 (Actor, Movie, Actor) to create a web
+      const movies = data.movies || [];
+      const actors = data.frequentActors || [];
+      
+      // Combine them into a stream
+      const items = [];
+      movies.forEach(m => items.push({type:'movie', data:m}));
+      actors.forEach(a => items.push({type:'actor', data:a}));
+      
+      // Sort items randomly or interleaved to make it look like a constellation
+      // Let's just group them into columns of 3
+      let colIdx = 0;
+      let currentCol = null;
+      
+      for(let i=0; i<items.length; i++) {
+        if(i % 3 === 0) {
+          currentCol = document.createElement('div');
+          currentCol.className = 'timeline-column';
+          content.appendChild(currentCol);
+          colIdx++;
+        }
+        
+        const item = items[i];
+        const card = document.createElement('a');
+        card.className = 'node-card ' + (item.type === 'actor' ? 'actor-node' : '');
+        card.id = `node-${i}`;
+        
+        if(item.type === 'movie') {
+          card.href = `/movies/tmdb/${item.data.id}`;
+          const img = item.data.poster_path ? 'https://image.tmdb.org/t/p/w185' + item.data.poster_path : '/images/no-poster.jpg';
+          const year = item.data.release_date ? item.data.release_date.substring(0,4) : '';
+          card.innerHTML = `
+            <img src="${img}">
+            <div class="node-info">
+              <div class="node-title">${item.data.title || item.data.name}</div>
+              <div class="node-meta">${year} • Directed</div>
+            </div>
+          `;
+        } else {
+          // Actor
+          card.href = 'javascript:void(0)';
+          card.onclick = () => openActorModal(item.data.id);
+          const img = item.data.profile_path ? 'https://image.tmdb.org/t/p/w185' + item.data.profile_path : '/images/no-poster.jpg';
+          card.innerHTML = `
+            <img src="${img}">
+            <div class="node-info">
+              <div class="node-title">${item.data.name}</div>
+              <div class="node-meta">Frequent Collaborator (${item.data.collabCount} films)</div>
+            </div>
+          `;
+        }
+        
+        // Randomize vertical margin slightly for constellation effect
+        const margin = Math.random() * 50 - 25;
+        card.style.marginTop = margin + 'px';
+        
+        currentCol.appendChild(card);
+      }
+
+      // Hide loading
+      setTimeout(() => {
+        document.getElementById('loading').style.opacity = '0';
+        setTimeout(() => document.getElementById('loading').style.display = 'none', 500);
+        drawLines(items.length);
+      }, 500);
+    }
+
+    function drawLines(itemCount) {
+      const svg = document.getElementById('svg-layer');
+      const canvas = document.getElementById('canvas');
+      const dirNode = document.getElementById('node-director').querySelector('.director-img-wrapper');
+      
+      const dirRect = dirNode.getBoundingClientRect();
+      // Center of director image relative to canvas scroll
+      const startX = dirRect.right + canvas.scrollLeft;
+      const startY = dirRect.top + (dirRect.height/2) + canvas.scrollTop;
+      
+      let paths = '';
+      for(let i=0; i<itemCount; i++) {
+        const card = document.getElementById(`node-${i}`);
+        if(!card) continue;
+        const rect = card.getBoundingClientRect();
+        const endX = rect.left + canvas.scrollLeft;
+        const endY = rect.top + (rect.height/2) + canvas.scrollTop;
+        
+        // Draw curved bezier line
+        const cp1x = startX + (endX - startX) / 3;
+        const cp1y = startY;
+        const cp2x = startX + 2 * (endX - startX) / 3;
+        const cp2y = endY;
+        
+        // Calculate a slight delay based on distance
+        paths += `<path d="M ${startX} ${startY} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${endX} ${endY}" 
+                        fill="none" stroke="rgba(229,9,20,0.3)" stroke-width="2" 
+                        class="svg-line" />`;
+      }
+      svg.innerHTML = paths;
+    }
+    
+    // Redraw lines on window resize
+    window.addEventListener('resize', () => {
+      const cards = document.querySelectorAll('.node-card');
+      drawLines(cards.length);
+    });
+
+    // Modal Functions
+    function openActorModal(id) {
+      const modal = document.getElementById('actor-modal');
+      const body = document.getElementById('actor-modal-body');
+      modal.style.display = 'flex';
+      setTimeout(() => {
+        modal.style.opacity = '1';
+        document.getElementById('modal-content-box').style.transform = 'translateY(0)';
+      }, 10);
+      
+      body.innerHTML = '<div style="width:100%;text-align:center;">Loading...</div>';
+      
+      fetch('/api/actor/' + id)
+        .then(r => r.json())
+        .then(data => {
+          const imgUrl = data.profile_path ? 'https://image.tmdb.org/t/p/w500' + data.profile_path : '/images/no-poster.jpg';
+          let bio = data.biography || 'No biography available.';
+          if(bio.length > 600) bio = bio.substring(0, 600) + '...';
+          
+          let moviesHtml = '';
+          if(data.movie_credits && data.movie_credits.cast) {
+            const topMovies = data.movie_credits.cast.sort((a,b) => b.popularity - a.popularity).slice(0, 6);
+            moviesHtml = topMovies.map(m => `
+              <a href="/movies/tmdb/${m.id}" style="width:calc(33% - 10px);text-decoration:none">
+                <img src="${m.poster_path ? 'https://image.tmdb.org/t/p/w185'+m.poster_path : '/images/no-poster.jpg'}" style="width:100%;border-radius:6px;margin-bottom:0.5rem">
+                <div style="font-size:12px;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.title}</div>
+              </a>
+            `).join('');
+          }
+          
+          body.innerHTML = `
+            <div style="flex:0 0 200px">
+              <img src="${imgUrl}" style="width:100%;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.5)">
+            </div>
+            <div style="flex:1;min-width:300px;font-family:'Barlow',sans-serif">
+              <h2 style="font-family:'Bebas Neue',sans-serif;font-size:42px;margin:0 0 0.5rem 0;color:white;letter-spacing:0.05em">${data.name}</h2>
+              <div style="color:rgba(240,236,224,0.6);font-size:14px;margin-bottom:1.5rem">${data.place_of_birth || ''} ${data.birthday ? '· ' + data.birthday : ''}</div>
+              <p style="color:rgba(240,236,224,0.85);font-size:14px;line-height:1.6;margin-bottom:2rem">${bio}</p>
+              <h3 style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:white;margin-bottom:1rem;letter-spacing:0.05em">Known For</h3>
+              <div style="display:flex;gap:15px;flex-wrap:wrap">${moviesHtml}</div>
+            </div>
+          `;
+        });
+    }
+    function closeActorModal() {
+      const modal = document.getElementById('actor-modal');
+      modal.style.opacity = '0';
+      document.getElementById('modal-content-box').style.transform = 'translateY(20px)';
+      setTimeout(() => { modal.style.display = 'none'; }, 300);
+    }
+  </script>
+</body>
+</html>

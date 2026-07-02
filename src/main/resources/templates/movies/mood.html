@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(
+        'What are you in the mood for?',
+        ~{::main},
+        ~{::style[data-page]},
+        ~{::script[data-page]}
+      )}">
+<head>
+  <style data-page>
+    .mood-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .mood-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(36px, 6vw, 72px);
+      letter-spacing: 0.04em;
+      color: var(--cream);
+      margin-bottom: 0.5rem;
+    }
+
+    .mood-title span { color: var(--red); }
+
+    .mood-subtitle {
+      color: var(--text-secondary);
+      font-size: 16px;
+      margin-bottom: 3rem;
+      letter-spacing: 0.05em;
+    }
+
+    .mood-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    @media (max-width: 600px) {
+      .mood-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .mood-card {
+      position: relative;
+      padding: 2rem 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      overflow: hidden;
+    }
+
+    .mood-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .mood-card:hover {
+      transform: translateY(-6px) scale(1.03);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .mood-card:hover::before { opacity: 1; }
+
+    .mood-card[data-mood="thrilled"]::before  { background: linear-gradient(135deg, rgba(211,14,23,0.2), transparent); }
+    .mood-card[data-mood="emotional"]::before { background: linear-gradient(135deg, rgba(99,102,241,0.2), transparent); }
+    .mood-card[data-mood="mindblow"]::before  { background: linear-gradient(135deg, rgba(16,185,129,0.2), transparent); }
+    .mood-card[data-mood="feelgood"]::before  { background: linear-gradient(135deg, rgba(245,158,11,0.2), transparent); }
+    .mood-card[data-mood="scared"]::before    { background: linear-gradient(135deg, rgba(139,92,246,0.2), transparent); }
+    .mood-card[data-mood="inspired"]::before  { background: linear-gradient(135deg, rgba(59,130,246,0.2), transparent); }
+    .mood-card[data-mood="nostalgic"]::before { background: linear-gradient(135deg, rgba(217,70,239,0.2), transparent); }
+    .mood-card[data-mood="adrenaline"]::before{ background: linear-gradient(135deg, rgba(239,68,68,0.2), transparent); }
+    .mood-card[data-mood="cozy"]::before      { background: linear-gradient(135deg, rgba(251,146,60,0.2), transparent); }
+
+    .mood-emoji { font-size: 42px; line-height: 1; }
+
+    .mood-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cream);
+    }
+
+    .mood-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="page-wrapper">
+    <div class="mood-page">
+      <h1 class="mood-title">What's Your <span>Mood</span>?</h1>
+      <p class="mood-subtitle">Pick a feeling — we'll find the perfect film</p>
+
+      <div class="mood-grid">
+        <a th:href="@{/mood/thrilled}" class="mood-card" data-mood="thrilled">
+          <div class="mood-emoji">🔥</div>
+          <div class="mood-name">Thrilled</div>
+          <div class="mood-desc">Action, Suspense, Edge of your seat</div>
+        </a>
+        <a th:href="@{/mood/emotional}" class="mood-card" data-mood="emotional">
+          <div class="mood-emoji">💙</div>
+          <div class="mood-name">Emotional</div>
+          <div class="mood-desc">Drama, Romance, Deep feelings</div>
+        </a>
+        <a th:href="@{/mood/mindblow}" class="mood-card" data-mood="mindblow">
+          <div class="mood-emoji">🤯</div>
+          <div class="mood-name">Mind Blown</div>
+          <div class="mood-desc">Sci-Fi, Mystery, Twists</div>
+        </a>
+        <a th:href="@{/mood/feelgood}" class="mood-card" data-mood="feelgood">
+          <div class="mood-emoji">😄</div>
+          <div class="mood-name">Feel Good</div>
+          <div class="mood-desc">Comedy, Family, Light-hearted</div>
+        </a>
+        <a th:href="@{/mood/scared}" class="mood-card" data-mood="scared">
+          <div class="mood-emoji">👻</div>
+          <div class="mood-name">Scared</div>
+          <div class="mood-desc">Horror, Supernatural, Chilling</div>
+        </a>
+        <a th:href="@{/mood/inspired}" class="mood-card" data-mood="inspired">
+          <div class="mood-emoji">✨</div>
+          <div class="mood-name">Inspired</div>
+          <div class="mood-desc">History, True stories, Uplifting</div>
+        </a>
+        <a th:href="@{/mood/nostalgic}" class="mood-card" data-mood="nostalgic">
+          <div class="mood-emoji">📼</div>
+          <div class="mood-name">Nostalgic</div>
+          <div class="mood-desc">Classics, 90s vibes, Retro</div>
+        </a>
+        <a th:href="@{/mood/adrenaline}" class="mood-card" data-mood="adrenaline">
+          <div class="mood-emoji">🏎️</div>
+          <div class="mood-name">Adrenaline</div>
+          <div class="mood-desc">High-octane, Racing, Intense Action</div>
+        </a>
+        <a th:href="@{/mood/cozy}" class="mood-card" data-mood="cozy">
+          <div class="mood-emoji">☕</div>
+          <div class="mood-name">Cozy</div>
+          <div class="mood-desc">Feel-good, Warm, Comforting</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+<script data-page></script>
+</body>
+</html>

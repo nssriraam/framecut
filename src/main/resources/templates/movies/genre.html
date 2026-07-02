@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: layout(
+        ${pageTitle},
+        ~{::main},
+        ~{::link[rel='stylesheet'][data-page]},
+        ~{::script[data-page]}
+      )}">
+<head>
+  <link rel="stylesheet" th:href="@{/css/main.css}" data-page>
+</head>
+<body>
+<main>
+  <div class="page-wrapper" style="padding-top:calc(var(--nav-height) + 2rem)">
+
+    <div class="container" style="margin-bottom:2rem">
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+        <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,60px);letter-spacing:0.04em;color:var(--cream);display:flex;align-items:center;gap:12px">
+          <span style="display:inline-block;width:6px;height:0.85em;background:var(--red);border-radius:2px;flex-shrink:0"></span>
+          <span th:text="${genre}">Genre</span>
+        </h1>
+        <!-- Movie / Series Toggle -->
+        <div style="display:flex;gap:0.5rem;margin-left:auto">
+          <a th:href="@{/genres/{g}(g=${genre})}"
+             th:classappend="${type == null ? ' btn-red' : ' btn-outline'}"
+             class="btn-outline" style="padding:0.4rem 1rem;font-size:13px">All</a>
+          <a th:href="@{/genres/{g}(g=${genre},type='movie')}"
+             th:classappend="${type == 'movie' ? ' btn-red' : ' btn-outline'}"
+             class="btn-outline" style="padding:0.4rem 1rem;font-size:13px">Movies</a>
+          <a th:href="@{/genres/{g}(g=${genre},type='tv')}"
+             th:classappend="${type == 'tv' ? ' btn-red' : ' btn-outline'}"
+             class="btn-outline" style="padding:0.4rem 1rem;font-size:13px">Series</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid -->
+    <div class="movie-grid container section visible" id="infinite-grid">
+      <a th:each="movie, stat : ${movies}"
+         th:href="@{/movies/{id}(id=${movie.id})}"
+         class="movie-card"
+         th:style="${'animation-delay:' + stat.index * 0.04 + 's'}">
+        <img class="movie-card-poster"
+             th:src="${movie.posterUrl}"
+             th:alt="${movie.title}"
+             loading="lazy"
+             onerror="this.src='/images/no-poster.jpg'">
+        <div class="movie-card-overlay">
+          <div class="movie-card-title" th:text="${movie.title}">Title</div>
+          <div class="movie-card-meta">
+            <span class="movie-card-rating"
+                  th:text="${movie.voteAverage != null ? '★ ' + #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'}">★</span>
+            <span th:text="${movie.releaseYear}">2024</span>
+          </div>
+        </div>
+        <div class="movie-card-bottom">
+          <div class="movie-card-bottom-title" th:text="${movie.title}">Title</div>
+          <div class="movie-card-bottom-meta">
+            <span th:text="${movie.releaseYear}">2024</span>
+            <span th:if="${movie.genreNames != null}"
+                  th:text="' · ' + ${movie.firstTwoGenres}"></span>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <div class="load-more-trigger" id="load-more-trigger"></div>
+
+  </div>
+</main>
+<script data-page th:inline="javascript">
+  window.infiniteScrollParams = {
+    genre: /*[[${genre}]]*/ '',
+    type: /*[[${type}]]*/ null,
+    section: 'genre'
+  };
+</script>
+</body>
+</html>

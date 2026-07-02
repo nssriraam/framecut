@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: layout(
+        ${movie.title},
+        ~{::main},
+        ~{::link[rel='stylesheet'][data-page]},
+        ~{::script[data-page]}
+      )}">
+<head>
+  <link rel="stylesheet" th:href="@{/css/detail.css}" data-page>
+</head>
+<body>
+<main>
+
+  <!-- Fixed full-viewport backdrop -->
+  <div class="detail-backdrop" id="detail-backdrop"
+       th:style="${movie.backdropUrl != null ? 'background-image: url(' + movie.backdropUrl + ')' : 'background:#1a1814'}"></div>
+  <div class="detail-backdrop-overlay"></div>
+  <div class="detail-accent-overlay" id="detail-accent-overlay"></div>
+
+  <div class="detail-page page-wrapper">
+    <!-- Top-Left Sleek Back Arrow -->
+    <a href="javascript:history.back()" style="position:absolute;top:6.5rem;left:2rem;color:white;text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.15em;display:flex;align-items:center;gap:0.5rem;z-index:50;text-transform:uppercase;transition:color 0.3s;font-size:14px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='white'">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back
+    </a>
+
+    <!-- ===== FULL VIEWPORT HERO — content directly over backdrop ===== -->
+    <div class="detail-hero" style="position:relative">
+
+      <!-- LEFT: Title, rating, description, buttons -->
+      <div class="detail-hero-left">
+
+        <h1 class="detail-title" th:text="${movie.title}">Movie Title</h1>
+
+        <!-- Rating row -->
+        <div class="detail-rating-row">
+          <div class="detail-tmdb-rating">
+            <span class="score"
+                  th:text="${movie.voteAverage != null ? #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'}">8.5</span>
+            <span class="max">/10</span>
+          </div>
+          <span class="detail-votes"
+                th:if="${movie.voteCount != null}"
+                th:text="${#numbers.formatInteger(movie.voteCount,1,'COMMA') + ' votes'}"></span>
+          <span class="detail-user-rating"
+                th:if="${reviewCount > 0}"
+                th:text="|★ ${#numbers.formatDecimal(avgRating,1,1)} · ${reviewCount} review${reviewCount != 1 ? 's' : ''}|"></span>
+        </div>
+
+        <!-- Genre tags -->
+        <div class="detail-genre-tags"
+             th:if="${movie.genreNames != null and !movie.genreNames.isEmpty()}">
+          <a th:each="genre : ${#strings.arraySplit(movie.genreNames, ',')}"
+             th:href="@{/genres/{g}(g=${genre.trim()})}"
+             th:text="${genre.trim()}"
+             class="genre-tag">Genre</a>
+        </div>
+
+        <!-- Overview -->
+        <p class="detail-overview" th:text="${movie.overview}">Overview text here.</p>
+
+        <!-- Buttons -->
+        <div class="detail-actions">
+          <a href="#reviews" class="btn-red">✎ Write a Review</a>
+          <button th:if="${trailerKey != null}" class="btn-outline" onclick="openTrailer()" style="cursor:pointer;display:flex;align-items:center;gap:0.5rem">
+            <span style="font-size:18px">▶</span> Watch Trailer
+          </button>
+          <button id="watchlist-btn"
+                  th:attr="data-movie-id=${movie.id}"
+                  class="btn-outline"
+                  sec:authorize="isAuthenticated()"
+                  onclick="toggleWatchlist(this)"
+                  style="cursor:pointer">
+            <span id="watchlist-icon">☆</span>
+            <span id="watchlist-text">Add to Watchlist</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Metadata sidebar — exactly like IT Chapter Two -->
+      <div class="detail-hero-right">
+
+        <div class="meta-item" th:if="${movie.genreNames != null and !movie.genreNames.isEmpty()}">
+          <div class="meta-label">Genre</div>
+          <div class="meta-value"
+               th:text="${movie.firstTwoGenres}">Action</div>
+        </div>
+
+        <div class="meta-item" th:if="${movie.releaseDate != null}">
+          <div class="meta-label">Premiere</div>
+          <div class="meta-value"
+               th:text="${#temporals.format(movie.releaseDate, 'd MMMM yyyy')}">1 Jan 2024</div>
+        </div>
+
+        <div class="meta-item" th:if="${movie.releaseYear != null and movie.releaseDate == null}">
+          <div class="meta-label">Year</div>
+          <div class="meta-value" th:text="${movie.releaseYear}">2024</div>
+        </div>
+
+        <div class="meta-item" 
+             th:if="${directorName != null and !directorName.isEmpty()}">
+          <div class="meta-label">Director</div>
+          <a class="meta-value director-link" th:href="@{/universe(director=${directorName})}" th:text="${directorName}" style="color:var(--red); text-decoration:none; display:flex; align-items:center; gap:0.25rem; font-weight:600; transition:color 0.2s" onmouseover="this.style.color='#fca5a5'" onmouseout="this.style.color='var(--red)'">Director</a>
+        </div>
+
+        <div class="meta-item" th:if="${movie.runtime != null and movie.runtime > 0}">
+          <div class="meta-label">Runtime</div>
+          <div class="meta-value" th:text="${movie.runtime + ' min'}">120 min</div>
+        </div>
+
+        <div class="meta-item">
+          <div class="meta-label">Type</div>
+          <div class="meta-value"
+               th:text="${movie.type == 'tv' ? 'TV Series' : 'Movie'}">Movie</div>
+        </div>
+
+        <div class="meta-item">
+          <div class="meta-label">Language</div>
+          <div class="meta-value"
+               th:text="${movie.originalLanguage != null ? movie.originalLanguage.toUpperCase() : 'EN'}">EN</div>
+        </div>
+
+      </div>
+
+      <!-- Scroll hint -->
+      <div class="detail-scroll-hint" style="display:none">
+        <div class="scroll-line"></div>
+        <span>Reviews</span>
+      </div>
+
+    </div>
+    <!-- end .detail-hero -->
+
+    <!-- ===== CAST RIBBON ===== -->
+    <div class="detail-content" style="padding-top:2rem; padding-bottom:1rem;" th:if="${cast != null and !cast.isEmpty()}">
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:0.05em;color:#f0ece0;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.75rem">
+        <span style="display:block;width:4px;height:1.1em;background:var(--red);border-radius:2px;flex-shrink:0"></span>
+        Top Cast
+      </h2>
+      <div class="cast-ribbon" style="display:flex;gap:1.5rem;overflow-x:auto;padding-bottom:1rem;scrollbar-width:none;-ms-overflow-style:none;">
+        <div th:each="actor : ${cast}" class="cast-card" th:attr="data-actor-id=${actor.id}" style="cursor:pointer;flex:0 0 auto;width:100px;text-align:center;" onclick="openActorModal(this.getAttribute('data-actor-id'))">
+          <div style="width:100px;height:100px;border-radius:50%;overflow:hidden;margin-bottom:0.75rem;border:2px solid transparent;transition:border-color 0.3s;background:#2a2520">
+            <img th:src="${actor.profile_path != null ? 'https://image.tmdb.org/t/p/w185' + actor.profile_path : '/images/no-poster.jpg'}" 
+                 style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s"
+                 onmouseover="this.style.transform='scale(1.1)'; this.parentElement.style.borderColor='var(--red)'"
+                 onmouseout="this.style.transform='scale(1)'; this.parentElement.style.borderColor='transparent'">
+          </div>
+          <div th:text="${actor.name}" style="font-size:13px;font-weight:600;color:#f0ece0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Actor Name</div>
+          <div th:text="${actor.character}" style="font-size:11px;color:rgba(240,236,224,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">Character</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== REVIEWS — below the viewport ===== -->
+    <div class="detail-content" id="reviews">
+
+      <div th:if="${reviewSuccess}" class="flash-msg flash-success" th:text="${reviewSuccess}"></div>
+      <div th:if="${reviewError}"   class="flash-msg flash-error"   th:text="${reviewError}"></div>
+
+      <div class="reviews-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem">
+          <h2 style="margin:0">Reviews
+            <span style="font-size:18px;opacity:0.5"
+                  th:if="${reviewCount > 0}"
+                  th:text="'(' + reviewCount + ')'"></span>
+          </h2>
+          <!-- Spoiler Toggle -->
+          <label style="display:flex;align-items:center;gap:0.75rem;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(240,236,224,0.5)">
+            <span>🔒 Unlock Spoilers</span>
+            <div style="position:relative;width:44px;height:24px">
+              <input type="checkbox" id="spoiler-toggle" onchange="toggleSpoilers()" style="opacity:0;width:0;height:0;position:absolute">
+              <div id="spoiler-track" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.1);border-radius:12px;transition:background 0.3s;cursor:pointer"></div>
+              <div id="spoiler-thumb" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:white;border-radius:50%;transition:transform 0.3s,background 0.3s"></div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Write review — logged in, not yet reviewed -->
+        <div class="review-form"
+             sec:authorize="isAuthenticated()"
+             th:if="${!hasReviewed}">
+          <h3>Write Your Review</h3>
+          <form th:action="@{/movies/{id}/review(id=${movie.id})}" method="post">
+            <input type="hidden" id="rating-input" name="rating" value="0">
+            <div class="star-picker">
+              <span class="star-pick" data-val="1">★</span>
+              <span class="star-pick" data-val="2">★</span>
+              <span class="star-pick" data-val="3">★</span>
+              <span class="star-pick" data-val="4">★</span>
+              <span class="star-pick" data-val="5">★</span>
+            </div>
+            <!-- Score out of 10 + one word summary -->
+            <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
+              <div style="flex:1;min-width:120px">
+                <label style="display:block;font-family:'Barlow Condensed',sans-serif;font-size:11px;
+                              font-weight:700;letter-spacing:0.15em;text-transform:uppercase;
+                              color:rgba(240,236,224,0.5);margin-bottom:0.4rem">Score /10 (optional)</label>
+                <input type="number" name="score" min="0" max="10" step="0.5"
+                       placeholder="e.g. 8.5"
+                       style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+                              border-radius:6px;color:#f0ece0;font-family:'Barlow',sans-serif;font-size:14px;
+                              padding:0.6rem 0.75rem;outline:none">
+              </div>
+              <div style="flex:2;min-width:160px">
+                <label style="display:block;font-family:'Barlow Condensed',sans-serif;font-size:11px;
+                              font-weight:700;letter-spacing:0.15em;text-transform:uppercase;
+                              color:rgba(240,236,224,0.5);margin-bottom:0.4rem">One Word Summary (optional)</label>
+                <input type="text" name="summary" maxlength="50"
+                       placeholder="e.g. Haunting, Brilliant, Intense..."
+                       style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+                              border-radius:6px;color:#f0ece0;font-family:'Barlow',sans-serif;font-size:14px;
+                              padding:0.6rem 0.75rem;outline:none">
+              </div>
+            </div>
+            <textarea class="review-textarea" name="content"
+                      placeholder="Share your thoughts on this film..."></textarea>
+            <label style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;cursor:pointer;font-size:13px;color:rgba(240,236,224,0.6)">
+              <input type="checkbox" name="hasSpoilers" value="true" style="accent-color:var(--red);width:16px;height:16px">
+              <span>⚠️ This review contains spoilers</span>
+            </label>
+            <button type="submit" class="btn-red">Submit Review</button>
+          </form>
+        </div>
+
+        <!-- Already reviewed -->
+        <div class="review-form"
+             sec:authorize="isAuthenticated()"
+             th:if="${hasReviewed and userReview != null}">
+          <h3>Your Review</h3>
+          <div style="display:flex;gap:3px;margin-bottom:0.75rem">
+            <span th:each="i : ${#numbers.sequence(1,5)}"
+                  th:style="${i <= userReview.rating ? 'color:#f5c842;font-size:20px' : 'color:#3a3530;font-size:20px'}">★</span>
+          </div>
+          <p th:text="${userReview.content}"
+             style="font-size:14px;color:rgba(240,236,224,0.75);line-height:1.65"></p>
+          <form th:action="@{/movies/review/{rid}/delete(rid=${userReview.id})}"
+                method="post" style="margin-top:0.75rem">
+            <input type="hidden" name="movieId" th:value="${movie.id}">
+            <button type="submit"
+                    style="background:none;border:none;color:rgba(252,165,165,0.7);cursor:pointer;font-size:13px;padding:0;transition:color 0.2s"
+                    onmouseover="this.style.color='#fca5a5'"
+                    onmouseout="this.style.color='rgba(252,165,165,0.7)'">
+              Delete review
+            </button>
+          </form>
+        </div>
+
+        <!-- Not logged in -->
+        <div class="review-form" sec:authorize="isAnonymous()">
+          <p style="color:rgba(240,236,224,0.5);font-size:15px">
+            <a th:href="@{/auth/login}" style="color:var(--red);font-weight:600">Sign in</a>
+            to write a review.
+          </p>
+        </div>
+
+        <!-- Reviews list -->
+        <div th:if="${!reviews.isEmpty()}">
+          <div th:each="review : ${reviews}" class="review-card" th:classappend="${review.hasSpoilers != null and review.hasSpoilers ? 'spoiler-review' : ''}">
+            <!-- Spoiler Warning Overlay -->
+            <div th:if="${review.hasSpoilers != null and review.hasSpoilers}" class="spoiler-overlay">
+              <span style="font-size:24px">🔒</span>
+              <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;font-size:13px">Spoiler — Toggle to reveal</span>
+            </div>
+            <div class="review-card-header">
+              <div class="reviewer-info">
+                <div class="reviewer-avatar"
+                     th:text="${review.user.username.substring(0,1).toUpperCase()}">U</div>
+                <div>
+                  <div class="reviewer-name" th:text="${review.user.username}">Username</div>
+                  <div class="review-date"
+                       th:text="${#temporals.format(review.createdAt,'dd MMM yyyy')}">Date</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.75rem">
+                <span th:if="${review.hasSpoilers != null and review.hasSpoilers}" style="background:rgba(229,9,20,0.2);color:#fca5a5;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:3px;border:1px solid rgba(229,9,20,0.3)">⚠ SPOILER</span>
+                <div class="review-stars">
+                  <span th:each="i : ${#numbers.sequence(1,5)}"
+                        th:style="${i <= review.rating ? 'color:#f5c842;font-size:16px' : 'color:#3a3530;font-size:16px'}">★</span>
+                </div>
+              </div>
+            </div>
+            <!-- Score + summary badge if present -->
+            <div th:if="${review.score != null or review.summary != null}"
+                 style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.6rem;flex-wrap:wrap">
+              <span th:if="${review.score != null}"
+                    style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#f5c842;line-height:1"
+                    th:text="${review.score + '/10'}">8.5/10</span>
+              <span th:if="${review.summary != null and !review.summary.isEmpty()}"
+                    style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);
+                           color:rgba(240,236,224,0.8);font-size:12px;font-weight:700;
+                           letter-spacing:0.08em;text-transform:uppercase;
+                           padding:0.2rem 0.6rem;border-radius:2px"
+                    th:text="${review.summary}">Haunting</span>
+            </div>
+            <p class="review-content" th:text="${review.content}">Review content</p>
+          </div>
+        </div>
+
+        <div th:if="${reviews.isEmpty()}"
+             style="color:rgba(240,236,224,0.35);padding:2rem 0;font-size:15px">
+          No reviews yet — be the first.
+        </div>
+      </div>
+
+      <!-- Similar Movies -->
+      <div th:if="${similarMovies != null and !similarMovies.isEmpty()}"
+           style="margin-top:3rem">
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:0.05em;
+                   color:#f0ece0;margin-bottom:1.5rem;display:flex;align-items:center;gap:0.75rem">
+          <span style="display:block;width:4px;height:1.1em;background:var(--red);border-radius:2px;flex-shrink:0"></span>
+          You Might Also Like
+        </h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px">
+          <a th:each="sim : ${similarMovies}"
+             th:href="@{/movies/{id}(id=${sim.id})}"
+             class="movie-card" style="width:100%;flex-shrink:unset">
+            <img class="movie-card-poster"
+                 th:src="${sim.posterUrl}"
+                 th:alt="${sim.title}"
+                 loading="lazy"
+                 onerror="this.src='/images/no-poster.jpg'">
+            <div class="movie-card-overlay">
+              <div class="movie-card-title" th:text="${sim.title}">Title</div>
+              <div class="movie-card-meta">
+                <span class="movie-card-rating"
+                      th:text="${sim.voteAverage != null ? '★ ' + #numbers.formatDecimal(sim.voteAverage,1,1) : 'N/A'}">★</span>
+              </div>
+            </div>
+            <div class="movie-card-bottom">
+              <div class="movie-card-bottom-title" th:text="${sim.title}">Title</div>
+              <div class="movie-card-bottom-meta" th:text="${sim.releaseYear}">2024</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+<style>
+  /* Spoiler Mode */
+  .spoiler-review { position: relative; }
+  .spoiler-review .review-content,
+  .spoiler-review .review-card-header ~ div { filter: blur(8px); user-select: none; transition: filter 0.4s ease; }
+  .spoiler-review .review-card-header { position: relative; z-index: 2; }
+  .spoiler-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: rgba(240,236,224,0.6); pointer-events: none; transition: opacity 0.4s; }
+  .spoilers-unlocked .spoiler-review .review-content,
+  .spoilers-unlocked .spoiler-review .review-card-header ~ div { filter: none; user-select: auto; }
+  .spoilers-unlocked .spoiler-overlay { opacity: 0; }
+
+  /* Trailer Modal */
+  .trailer-modal { display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:99999; align-items:center; justify-content:center; opacity:0; transition:opacity 0.4s; }
+  .trailer-modal.active { display:flex; }
+  .trailer-backdrop { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); }
+  .trailer-close { position:absolute; top:2rem; right:2rem; background:none; border:none; color:white; font-size:36px; cursor:pointer; z-index:10; transition:color 0.2s; }
+  .trailer-close:hover { color:var(--red); }
+  .trailer-frame { position:relative; z-index:5; width:90vw; max-width:1100px; aspect-ratio:16/9; border-radius:12px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,0.8); transform:scale(0.9); transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  .trailer-modal.visible .trailer-frame { transform:scale(1); }
+</style>
+
+<!-- TRAILER MODAL -->
+<div id="trailer-modal" class="trailer-modal">
+  <div class="trailer-backdrop" onclick="closeTrailer()"></div>
+  <button class="trailer-close" onclick="closeTrailer()">&times;</button>
+  <div class="trailer-frame">
+    <iframe id="trailer-iframe" width="100%" height="100%" frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen></iframe>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  const trailerKey = /*[[${trailerKey}]]*/ null;
+
+  function openTrailer() {
+    if(!trailerKey) return;
+    const modal = document.getElementById('trailer-modal');
+    const iframe = document.getElementById('trailer-iframe');
+    iframe.src = 'https://www.youtube.com/embed/' + trailerKey + '?autoplay=1&rel=0';
+    modal.classList.add('active');
+    setTimeout(() => { modal.style.opacity = '1'; modal.classList.add('visible'); }, 10);
+  }
+  function closeTrailer() {
+    const modal = document.getElementById('trailer-modal');
+    const iframe = document.getElementById('trailer-iframe');
+    modal.style.opacity = '0';
+    modal.classList.remove('visible');
+    setTimeout(() => { modal.classList.remove('active'); iframe.src = ''; }, 400);
+  }
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeTrailer(); });
+
+  function toggleSpoilers() {
+    const section = document.querySelector('.reviews-section');
+    const track = document.getElementById('spoiler-track');
+    const thumb = document.getElementById('spoiler-thumb');
+    if(document.getElementById('spoiler-toggle').checked) {
+      section.classList.add('spoilers-unlocked');
+      track.style.background = 'var(--red)';
+      thumb.style.transform = 'translateX(20px)';
+    } else {
+      section.classList.remove('spoilers-unlocked');
+      track.style.background = 'rgba(255,255,255,0.1)';
+      thumb.style.transform = 'translateX(0)';
+    }
+  }
+</script>
+
+<script>
+function toggleWatchlist(btn) {
+  const movieId = btn.getAttribute('data-movie-id');
+  const icon = document.getElementById('watchlist-icon');
+  const text = document.getElementById('watchlist-text');
+  fetch(`/api/watchlist/toggle/${movieId}`, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      if (data.added) {
+        icon.textContent = '★';
+        text.textContent = 'In Watchlist';
+        btn.style.borderColor = 'var(--red)';
+        btn.style.color = 'var(--red)';
+      } else {
+        icon.textContent = '☆';
+        text.textContent = 'Add to Watchlist';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+      }
+    });
+}
+</script>
+
+<!-- ACTOR MODAL -->
+<div id="actor-modal" class="glass-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s">
+  <div class="glass-modal-backdrop" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);" onclick="closeActorModal()"></div>
+  <div class="glass-modal-content" style="position:relative;background:rgba(26,24,20,0.85);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;width:90%;max-width:800px;max-height:85vh;overflow-y:auto;display:flex;flex-direction:column;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);transform:translateY(20px);transition:transform 0.3s">
+    <button onclick="closeActorModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:white;font-size:24px;cursor:pointer;z-index:10">&times;</button>
+    <div id="actor-modal-body" style="padding:2.5rem;display:flex;gap:2.5rem;flex-wrap:wrap">
+       <!-- Content injected via JS -->
+    </div>
+  </div>
+</div>
+
+<script>
+function openActorModal(id) {
+  const modal = document.getElementById('actor-modal');
+  const body = document.getElementById('actor-modal-body');
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    modal.style.opacity = '1';
+    modal.querySelector('.glass-modal-content').style.transform = 'translateY(0)';
+  }, 10);
+  
+  body.innerHTML = '<div style="color:white;width:100%;text-align:center;padding:2rem">Loading...</div>';
+  
+  fetch('/api/actor/' + id)
+    .then(r => r.json())
+    .then(data => {
+      const imgUrl = data.profile_path ? 'https://image.tmdb.org/t/p/w500' + data.profile_path : '/images/no-poster.jpg';
+      let bio = data.biography || 'No biography available.';
+      if(bio.length > 600) bio = bio.substring(0, 600) + '...';
+      
+      let moviesHtml = '';
+      if(data.movie_credits && data.movie_credits.cast) {
+        const topMovies = data.movie_credits.cast.sort((a,b) => b.popularity - a.popularity).slice(0, 6);
+        moviesHtml = topMovies.map(m => `
+          <a href="/movies/tmdb/${m.id}" style="width:calc(33% - 10px);text-decoration:none">
+            <img src="${m.poster_path ? 'https://image.tmdb.org/t/p/w185'+m.poster_path : '/images/no-poster.jpg'}" style="width:100%;border-radius:6px;margin-bottom:0.5rem">
+            <div style="font-size:12px;color:white;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.title}</div>
+          </a>
+        `).join('');
+      }
+      
+      body.innerHTML = `
+        <div style="flex:0 0 200px">
+          <img src="${imgUrl}" style="width:100%;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.5)">
+        </div>
+        <div style="flex:1;min-width:300px">
+          <h2 style="font-family:'Bebas Neue',sans-serif;font-size:42px;margin:0 0 0.5rem 0;color:white;letter-spacing:0.05em">${data.name}</h2>
+          <div style="color:rgba(240,236,224,0.6);font-size:14px;margin-bottom:1.5rem">${data.place_of_birth || ''} ${data.birthday ? '· ' + data.birthday : ''}</div>
+          <p style="color:rgba(240,236,224,0.85);font-size:14px;line-height:1.6;margin-bottom:2rem">${bio}</p>
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:white;margin-bottom:1rem;letter-spacing:0.05em">Known For</h3>
+          <div style="display:flex;gap:15px;flex-wrap:wrap">${moviesHtml}</div>
+        </div>
+      `;
+    });
+}
+function closeActorModal() {
+  const modal = document.getElementById('actor-modal');
+  modal.style.opacity = '0';
+  modal.querySelector('.glass-modal-content').style.transform = 'translateY(20px)';
+  setTimeout(() => { modal.style.display = 'none'; }, 300);
+}
+</script>
+</main>
+
+<script data-page th:inline="javascript">
+  window.movieBackdropUrl = /*[[${movie.backdropUrl}]]*/ null;
+  window.moviePosterUrl = /*[[${movie.posterUrl}]]*/ null;
+</script>
+<script data-page>
+// === CHAMELEON UI — Dynamic Color Extraction ===
+(function() {
+  const posterUrl = window.moviePosterUrl;
+  if(!posterUrl) return;
+  
+  const img = new Image();
+  img.crossOrigin = 'Anonymous';
+  img.src = posterUrl;
+  img.onload = function() {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 50;
+    canvas.height = 75;
+    ctx.drawImage(img, 0, 0, 50, 75);
+    
+    const data = ctx.getImageData(0, 0, 50, 75).data;
+    let r=0, g=0, b=0, count=0;
+    
+    for(let i=0; i<data.length; i+=16) {
+      const pr=data[i], pg=data[i+1], pb=data[i+2];
+      // Skip very dark/light pixels
+      const brightness = (pr+pg+pb)/3;
+      if(brightness > 30 && brightness < 220) {
+        r+=pr; g+=pg; b+=pb; count++;
+      }
+    }
+    if(count === 0) return;
+    r=Math.round(r/count); g=Math.round(g/count); b=Math.round(b/count);
+    
+    // Darken and saturate for premium aesthetic
+    const factor = 0.6;
+    r=Math.round(r*factor); g=Math.round(g*factor); b=Math.round(b*factor);
+    
+    const color = `${r},${g},${b}`;
+    
+    // Apply chameleon accents
+    document.documentElement.style.setProperty('--chameleon', `rgb(${color})`);
+    document.documentElement.style.setProperty('--chameleon-glow', `rgba(${color},0.3)`);
+    
+    // Update accent overlay gradient
+    const overlay = document.getElementById('detail-accent-overlay');
+    if(overlay) {
+      overlay.style.background = `radial-gradient(ellipse at 20% 50%, rgba(${color},0.15) 0%, transparent 70%)`;
+    }
+  };
+})();
+</script>
+</body>
+</html>

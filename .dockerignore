@@ -1,0 +1,10 @@
+target/
+{src/
+*.log
+docker.log
+docker2.log
+docker3.log
+maven_debug.log
+.git/
+.idea/
+*.iml

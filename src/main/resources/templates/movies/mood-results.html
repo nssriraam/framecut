@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(
+        ${mood},
+        ~{::main},
+        ~{::link[rel='stylesheet'][data-page]},
+        ~{::script[data-page]}
+      )}">
+<head>
+  <link rel="stylesheet" th:href="@{/css/main.css}" data-page>
+</head>
+<body>
+<main>
+  <div class="page-wrapper" style="padding-top:calc(var(--nav-height) + 2rem)">
+    <div class="container" style="margin-bottom:2rem">
+      <a th:href="@{/mood}"
+         style="color:var(--text-secondary);text-decoration:none;font-size:13px;
+                font-family:'Barlow Condensed',sans-serif;letter-spacing:0.1em;
+                text-transform:uppercase;display:inline-flex;align-items:center;gap:0.3rem;
+                margin-bottom:1rem;transition:color 0.2s"
+         onmouseover="this.style.color='var(--red)'"
+         onmouseout="this.style.color='var(--text-secondary)'">← Back to Moods</a>
+
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,60px);
+                 letter-spacing:0.04em;color:var(--cream)">
+        <span style="color:var(--red)" th:switch="${mood}">
+          <span th:case="'thrilled'">🔥</span>
+          <span th:case="'emotional'">💙</span>
+          <span th:case="'mindblow'">🤯</span>
+          <span th:case="'feelgood'">😄</span>
+          <span th:case="'scared'">👻</span>
+          <span th:case="'inspired'">✨</span>
+        </span>
+        <span th:text="${#strings.capitalize(mood)}">Mood</span>
+      </h1>
+    </div>
+
+    <div class="movie-grid container section visible" id="infinite-grid">
+      <a th:each="movie, stat : ${movies}"
+         th:href="@{/movies/{id}(id=${movie.id})}"
+         class="movie-card"
+         th:style="${'animation-delay:' + stat.index * 0.04 + 's'}">
+        <img class="movie-card-poster"
+             th:src="${movie.posterUrl}"
+             th:alt="${movie.title}"
+             loading="lazy"
+             onerror="this.src='/images/no-poster.jpg'">
+        <div class="movie-card-overlay">
+          <div class="movie-card-title" th:text="${movie.title}">Title</div>
+          <div class="movie-card-meta">
+            <span class="movie-card-rating"
+                  th:text="${movie.voteAverage != null ? '★ ' + #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'}">★</span>
+            <span th:text="${movie.releaseYear}">2024</span>
+          </div>
+        </div>
+        <div class="movie-card-bottom">
+          <div class="movie-card-bottom-title" th:text="${movie.title}">Title</div>
+          <div class="movie-card-bottom-meta" th:text="${movie.releaseYear}">2024</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="load-more-trigger" id="load-more-trigger"></div>
+  </div>
+</main>
+<script data-page th:inline="javascript">
+  window.infiniteScrollParams = {
+    mood: /*[[${mood}]]*/ '',
+    section: 'mood'
+  };
+</script>
+</body>
+</html>

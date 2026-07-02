@@ -1,0 +1,15 @@
+# Maven
+target/
+*.jar
+*.war
+*.ear
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Docker & Secrets
+.env
+framecut_pgdata/

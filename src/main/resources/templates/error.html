@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Error — FrameCut</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem">
+  <div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:120px;color:var(--red);line-height:1"
+         th:text="${errorCode ?: '500'}">500</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--cream);margin-bottom:1rem"
+         th:text="${errorMsg ?: 'Something went wrong'}">Error</div>
+    <a href="/" style="color:var(--red);text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:0.1em">
+      ← BACK TO HOME
+    </a>
+  </div>
+</div>
+</body>
+</html>

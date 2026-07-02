@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: framecut-postgres
+    environment:
+      POSTGRES_DB: framecut
+      POSTGRES_USER: framecut
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - framecut_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U framecut -d framecut"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: framecut-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/framecut
+      SPRING_DATASOURCE_USERNAME: framecut
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: 86400000
+      TMDB_API_KEY: ${TMDB_API_KEY}
+      TMDB_FETCH_ON_STARTUP: "true"
+      TMDB_PAGES_PER_RUN: "50"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  framecut_pgdata:
+    name: framecut_pgdata
+    external: false

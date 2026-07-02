@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: layout(
+        'My Profile',
+        ~{::main},
+        ~{::extraCss},
+        ~{::script[data-page]}
+      )}">
+<head>
+  <th:block th:fragment="extraCss">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+    .profile-hero {
+      background: linear-gradient(to bottom, rgba(211,14,23,0.08), transparent);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 3rem 2rem 2rem;
+      margin-bottom: 3rem;
+    }
+    .profile-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      animation: detailReveal 0.6s ease both;
+    }
+    @keyframes detailReveal {
+      from { opacity:0; transform:translateY(20px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    .profile-avatar-big {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      color: white;
+      flex-shrink: 0;
+      border: 3px solid rgba(211,14,23,0.5);
+      box-shadow: 0 0 30px rgba(211,14,23,0.3);
+    }
+    .profile-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      letter-spacing: 0.03em;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .profile-email {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-top: 0.25rem;
+    }
+    .profile-badge {
+      display: inline-block;
+      background: var(--red);
+      color: white;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 2px;
+      margin-top: 0.5rem;
+    }
+    .profile-stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+    .stat-item { text-align: center; }
+    .stat-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .profile-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    .section-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 0.05em;
+      color: var(--cream);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 1.1em;
+      background: var(--red);
+      border-radius: 2px;
+    }
+    .review-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+    }
+    .review-row:hover {
+      border-color: rgba(211,14,23,0.3);
+      background: rgba(211,14,23,0.04);
+      transform: translateX(4px);
+    }
+    .review-row-poster {
+      width: 48px;
+      height: 72px;
+      object-fit: cover;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .review-row-info { flex: 1; min-width: 0; }
+    .review-row-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--cream);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .review-row-meta { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+    .review-row-stars { flex-shrink: 0; color: #f5c842; font-size: 14px; }
+  </style>
+  </th:block>
+</head>
+<body>
+<main>
+  <div class="page-wrapper">
+
+    <!-- Profile Hero -->
+    <div class="profile-hero">
+      <div class="profile-inner">
+        <div class="profile-avatar-big"
+             th:text="${currentUser.username.substring(0,1).toUpperCase()}">U</div>
+        <div>
+          <div class="profile-name" th:text="${currentUser.username}">Username</div>
+          <div class="profile-email" th:text="${currentUser.email}">email</div>
+          <div class="profile-badge" th:text="${currentUser.role}">USER</div>
+          <div class="profile-stats">
+            <div class="stat-item">
+              <div class="stat-number" th:text="${totalReviews}">0</div>
+              <div class="stat-label">Reviews</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number"
+                   th:text="${#temporals.format(currentUser.createdAt, 'yyyy')}">2024</div>
+              <div class="stat-label">Member Since</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Reviews -->
+    <div class="profile-content">
+      <div class="section-label">Recent Reviews</div>
+
+      <div th:if="${!reviews.isEmpty()}">
+        <a th:each="review : ${reviews}"
+           th:href="@{/movies/{id}(id=${review.movie.id})}"
+           class="review-row">
+          <img class="review-row-poster"
+               th:src="${review.movie.posterUrl}"
+               th:alt="${review.movie.title}"
+               onerror="this.src='/images/no-poster.jpg'">
+          <div class="review-row-info">
+            <div class="review-row-title" th:text="${review.movie.title}">Movie Title</div>
+            <div class="review-row-meta">
+              <span th:text="${#temporals.format(review.createdAt, 'dd MMM yyyy')}">Date</span>
+              <span th:if="${review.content != null and !review.content.isEmpty()}"
+                    th:text="' · ' + ${review.content.length() > 60 ? review.content.substring(0,60) + '...' : review.content}"></span>
+            </div>
+          </div>
+          <div class="review-row-stars">
+            <span th:each="i : ${#numbers.sequence(1,review.rating)}">★</span>
+          </div>
+        </a>
+      </div>
+
+      <div th:if="${reviews.isEmpty()}"
+           style="color:var(--text-secondary);padding:2rem 0;text-align:center;font-size:15px">
+        No reviews yet.
+        <a th:href="@{/}" style="color:var(--red)">Start watching!</a>
+      </div>
+
+      <div th:if="${totalReviews > 5}" style="margin-top:1.5rem;text-align:center">
+        <a th:href="@{/my-reviews}" class="btn-outline">View All Reviews</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+<script data-page></script>
+</body>
+</html>

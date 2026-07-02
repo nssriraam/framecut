@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: layout(
+        'Home',
+        ~{::main},
+        ~{::link[rel='stylesheet'][data-page]},
+        ~{::script[data-page]}
+      )}">
+<head>
+  <link rel="stylesheet" th:href="@{/css/main.css}" data-page>
+</head>
+<body>
+<main>
+  <div class="page-wrapper">
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="hero">
+      <div class="hero-backdrop">
+        <div th:each="movie, stat : ${heroMovies}"
+             class="hero-slide"
+             th:style="|background-image: url('${movie.backdropUrl}')|"
+             th:classappend="${stat.first ? ' active' : ''}"></div>
+      </div>
+      <div class="hero-overlay"></div>
+
+      <div class="hero-content">
+        <div class="hero-logo">FRAMECUT</div>
+        <div class="hero-tagline">YOUR CINEMA. YOUR STORY.</div>
+        <a href="#trending" class="hero-cta">
+          <span>▶</span> EXPLORE FILMS
+        </a>
+      </div>
+
+      <div class="hero-scroll-hint" style="display:none">
+        <div class="scroll-line"></div>
+        <span>Scroll</span>
+      </div>
+    </section>
+
+    <!-- ===== TRENDING NOW ===== -->
+    <section class="section" id="trending">
+      <div class="section-header">
+        <h2 class="section-title">Trending Now</h2>
+        <a href="/movies" class="see-all">See All →</a>
+      </div>
+      <div class="scroll-row-wrapper">
+        <button class="row-arrow left">‹</button>
+        <div class="scroll-row">
+          <a th:each="movie : ${trending}"
+             th:href="@{/movies/{id}(id=${movie.id})}"
+             class="movie-card">
+            <img class="movie-card-poster"
+                 th:src="${movie.posterUrl != null and !movie.posterUrl.isEmpty() ? movie.posterUrl : '/images/no-poster.jpg'}"
+                 th:alt="${movie.title}"
+                 loading="lazy"
+                 onerror="this.src='/images/no-poster.jpg'">
+            <div class="movie-card-overlay">
+              <div class="movie-card-title" th:text="${movie.title}">Title</div>
+              <div class="movie-card-meta">
+                <span class="movie-card-rating"
+                      th:text="${movie.voteAverage != null ? '★ ' + #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'}">★ 0.0</span>
+                <span th:text="${movie.releaseYear}">2024</span>
+              </div>
+            </div>
+            <div class="movie-card-bottom">
+              <div class="movie-card-bottom-title" th:text="${movie.title}">Title</div>
+              <div class="movie-card-bottom-meta">
+                <span th:text="${movie.releaseYear}">2024</span>
+                <span th:if="${movie.genreNames != null and !movie.genreNames.isEmpty()}"
+                      th:text="' · ' + ${movie.firstTwoGenres}"></span>
+              </div>
+            </div>
+          </a>
+        </div>
+        <button class="row-arrow right">›</button>
+      </div>
+    </section>
+
+    <!-- ===== NEW RELEASES ===== -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">New Releases</h2>
+        <a href="/movies?sort=year" class="see-all">See All →</a>
+      </div>
+      <div class="scroll-row-wrapper">
+        <button class="row-arrow left">‹</button>
+        <div class="scroll-row">
+          <a th:each="movie : ${newReleases}"
+             th:href="@{/movies/{id}(id=${movie.id})}"
+             class="movie-card">
+            <img class="movie-card-poster"
+                 th:src="${movie.posterUrl != null and !movie.posterUrl.isEmpty() ? movie.posterUrl : '/images/no-poster.jpg'}"
+                 th:alt="${movie.title}"
+                 loading="lazy"
+                 onerror="this.src='/images/no-poster.jpg'">
+            <div class="movie-card-overlay">
+              <div class="movie-card-title" th:text="${movie.title}">Title</div>
+              <div class="movie-card-meta">
+                <span class="movie-card-rating"
+                      th:text="${movie.voteAverage != null ? '★ ' + #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'}">★</span>
+                <span th:text="${movie.releaseYear}">2024</span>
+              </div>
+            </div>
+            <div class="movie-card-bottom">
+              <div class="movie-card-bottom-title" th:text="${movie.title}">Title</div>
+              <div class="movie-card-bottom-meta" th:text="${movie.releaseYear}">2024</div>
+            </div>
+          </a>
+        </div>
+        <button class="row-arrow right">›</button>
+      </div>
+    </section>
+
+    <!-- ===== TOP RATED ===== -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Top Rated</h2>
+        <a href="/movies?sort=rating" class="see-all">See All →</a>
+      </div>
+      <div class="scroll-row-wrapper">
+        <button class="row-arrow left">‹</button>
+        <div class="scroll-row">
+          <a th:each="movie : ${topRated}"
+             th:href="@{/movies/{id}(id=${movie.id})}"
+             class="movie-card">
+            <img class="movie-card-poster"
+                 th:src="${movie.posterUrl != null and !movie.posterUrl.isEmpty() ? movie.posterUrl : '/images/no-poster.jpg'}"
+                 th:alt="${movie.title}"
+                 loading="lazy"
+                 onerror="this.src='/images/no-poster.jpg'">
+            <div class="movie-card-overlay">
+              <div class="movie-card-title" th:text="${movie.title}">Title</div>
+              <div class="movie-card-meta">
+                <span class="movie-card-rating"
+                      th:text="${movie.voteAverage != null ? '★ ' + #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'}">★</span>
+                <span th:text="${movie.releaseYear}">2024</span>
+              </div>
+            </div>
+            <div class="movie-card-bottom">
+              <div class="movie-card-bottom-title" th:text="${movie.title}">Title</div>
+              <div class="movie-card-bottom-meta"
+                   th:text="${movie.voteAverage != null ? '★ ' + #numbers.formatDecimal(movie.voteAverage,1,1) : ''}">★</div>
+            </div>
+          </a>
+        </div>
+        <button class="row-arrow right">›</button>
+      </div>
+    </section>
+
+    <!-- ===== POPULAR SERIES ===== -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Popular Series</h2>
+        <a href="/tv" class="see-all">See All →</a>
+      </div>
+      <div class="scroll-row-wrapper">
+        <button class="row-arrow left">‹</button>
+        <div class="scroll-row">
+          <a th:each="movie : ${popularSeries}"
+             th:href="@{/movies/{id}(id=${movie.id})}"
+             class="movie-card">
+            <img class="movie-card-poster"
+                 th:src="${movie.posterUrl != null and !movie.posterUrl.isEmpty() ? movie.posterUrl : '/images/no-poster.jpg'}"
+                 th:alt="${movie.title}"
+                 loading="lazy"
+                 onerror="this.src='/images/no-poster.jpg'">
+            <div class="movie-card-overlay">
+              <div class="movie-card-title" th:text="${movie.title}">Title</div>
+              <div class="movie-card-meta">
+                <span class="movie-card-rating"
+                      th:text="${movie.voteAverage != null ? '★ ' + #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'}">★</span>
+                <span>Series</span>
+              </div>
+            </div>
+            <div class="movie-card-bottom">
+              <div class="movie-card-bottom-title" th:text="${movie.title}">Title</div>
+              <div class="movie-card-bottom-meta">Series · <span th:text="${movie.releaseYear}">2024</span></div>
+            </div>
+          </a>
+        </div>
+        <button class="row-arrow right">›</button>
+      </div>
+    </section>
+
+    <!-- ===== EXPLORE BY GENRE ===== -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Explore by Genre</h2>
+      </div>
+      <div class="genre-grid container">
+        <a th:each="genre : ${genres}"
+           th:href="@{/genres/{g}(g=${genre})}"
+           class="genre-tile">
+          <div class="genre-tile-bg"></div>
+          <div class="genre-tile-overlay"></div>
+          <span class="genre-tile-name" th:text="${genre}">Genre</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== ALL MOVIES (infinite scroll) ===== -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">All Cinema</h2>
+      </div>
+      <div class="movie-grid" id="infinite-grid">
+        <a th:each="movie : ${trending}"
+           th:href="@{/movies/{id}(id=${movie.id})}"
+           class="movie-card">
+          <img class="movie-card-poster"
+               th:src="${movie.posterUrl != null and !movie.posterUrl.isEmpty() ? movie.posterUrl : '/images/no-poster.jpg'}"
+               th:alt="${movie.title}"
+               loading="lazy">
+          <div class="movie-card-overlay">
+            <div class="movie-card-title" th:text="${movie.title}">Title</div>
+            <div class="movie-card-meta">
+              <span class="movie-card-rating"
+                    th:text="${movie.voteAverage != null ? '★ ' + #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'}">★</span>
+              <span th:text="${movie.releaseYear}">2024</span>
+            </div>
+          </div>
+          <div class="movie-card-bottom">
+            <div class="movie-card-bottom-title" th:text="${movie.title}">Title</div>
+            <div class="movie-card-bottom-meta" th:text="${movie.releaseYear}">2024</div>
+          </div>
+        </a>
+      </div>
+      <div class="load-more-trigger" id="load-more-trigger"></div>
+    </section>
+
+  </div>
+</main>
+
+<script data-page>
+  window.infiniteScrollParams = { section: 'trending' };
+</script>
+</body>
+</html>

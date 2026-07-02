@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="layout(title, content, extraCss, extraJs)">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${title} + ' — FrameCut'">FrameCut</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+  <th:block th:replace="${extraCss}"></th:block>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+</head>
+<body>
+
+<!-- Loading Screen (shown only once per session) -->
+<div id="loading-screen">
+  <div class="marquee-container" id="marquee-container"></div>
+</div>
+
+<!-- Navbar -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a th:href="@{/}" class="nav-logo">FRAME<span>CUT</span></a>
+
+    <ul class="nav-links">
+      <li><a th:href="@{/}">Home</a></li>
+      <li><a th:href="@{/movies}">Movies</a></li>
+      <li><a th:href="@{/tv}">Series</a></li>
+      <li><a th:href="@{/mood}">Mood</a></li>
+      <li><a th:href="@{/hidden-gems}">Hidden Gems</a></li>
+      <li><a th:href="@{/universe}">Universe</a></li>
+      <li class="nav-dropdown">
+        <span class="nav-dropdown-toggle">
+          Genres <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1l4 4 4-4"/></svg>
+        </span>
+        <div class="dropdown-menu">
+          <a th:each="genre : ${genres}" th:href="@{/genres/{g}(g=${genre})}" th:text="${genre}">Genre</a>
+        </div>
+      </li>
+    </ul>
+
+    <div class="nav-right">
+      <div class="nav-search">
+        <input type="text" id="nav-search-input" placeholder="Search films, series..." autocomplete="off">
+        <div class="autocomplete-results" id="autocomplete-results"></div>
+      </div>
+
+      <div sec:authorize="isAnonymous()">
+        <a th:href="@{/auth/login}" class="nav-auth-btn">Sign In</a>
+      </div>
+
+      <div class="nav-user" sec:authorize="isAuthenticated()">
+        <div class="nav-avatar"
+             th:text="${currentUser != null ? currentUser.username.substring(0,1).toUpperCase() : 'U'}">U</div>
+        <div class="user-dropdown">
+          <a th:href="@{/profile}">My Profile</a>
+          <a th:href="@{/my-reviews}">My Reviews</a>
+          <a th:href="@{/watchlist}">My Watchlist</a>
+          <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">Admin Panel</a>
+          <a th:href="@{/auth/logout}" style="color:#fca5a5">Sign Out</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div th:replace="${content}">Content</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">FRAME<span>CUT</span></div>
+  <p>YOUR CINEMA. YOUR STORY.</p>
+  <p style="margin-top:0.5rem;font-size:12px">&copy; 2026 FrameCut &middot; All rights reserved</p>
+</footer>
+
+<script th:src="@{/js/main.js}"></script>
+<script th:replace="${extraJs}"></script>
+
+<script>
+  // Build loading screen marquee rows
+  (function() {
+    const container = document.getElementById('marquee-container');
+    if (!container) return;
+    const rows = 7;
+    const text = 'FRAMECUT ';
+    for (let i = 0; i < rows; i++) {
+      const row = document.createElement('div');
+      row.className = 'marquee-row' + (i === 3 ? ' highlight' : '');
+      const span = document.createElement('span');
+      span.textContent = (text).repeat(12);
+      row.appendChild(span);
+      container.appendChild(row);
+    }
+  })();
+</script>
+</body>
+</html>

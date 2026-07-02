@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(
+        'Admin Dashboard',
+        ~{::main},
+        ~{::link[rel='stylesheet'][data-page]},
+        ~{::script[data-page]}
+      )}">
+<head>
+  <link rel="stylesheet" th:href="@{/css/main.css}" data-page>
+</head>
+<body>
+<main>
+  <style>
+    .admin-wrap { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
+    .admin-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px;
+      color: var(--cream);
+      margin-bottom: 2rem;
+    }
+    .admin-title span { color: var(--red); }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .stat-card .n {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 42px;
+      color: var(--red);
+      line-height: 1;
+    }
+    .stat-card .l {
+      font-size: 13px;
+      color: var(--text-secondary);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 0.25rem;
+    }
+    .admin-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+  </style>
+  <div class="page-wrapper">
+    <div class="admin-wrap">
+      <h1 class="admin-title"><span>/</span> Admin Panel</h1>
+
+      <div th:if="${success}" class="flash-msg flash-success" th:text="${success}"></div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="n" th:text="${stats.totalMovies}">0</div>
+          <div class="l">Movies</div>
+        </div>
+        <div class="stat-card">
+          <div class="n" th:text="${stats.totalSeries}">0</div>
+          <div class="l">Series</div>
+        </div>
+        <div class="stat-card">
+          <div class="n" th:text="${stats.totalAll}">0</div>
+          <div class="l">Total</div>
+        </div>
+        <div class="stat-card">
+          <div class="n" th:text="${totalUsers}">0</div>
+          <div class="l">Users</div>
+        </div>
+      </div>
+
+      <div class="admin-actions">
+        <form th:action="@{/admin/sync}" method="post">
+          <button type="submit" class="btn-red">▶ Trigger TMDB Sync</button>
+        </form>
+        <a th:href="@{/}" class="btn-outline">View Site</a>
+        <a href="/swagger-ui/index.html" class="btn-outline" target="_blank">API Docs</a>
+      </div>
+    </div>
+  </div>
+</main>
+<script data-page></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — FrameCut</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+  <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+
+<!-- Loading screen -->
+<div id="loading-screen">
+  <div class="marquee-container" id="marquee-container"></div>
+</div>
+
+<div class="auth-page">
+  <div class="auth-bg">
+    <div class="auth-bg-text" id="auth-bg-text"></div>
+    <div class="auth-overlay"></div>
+  </div>
+
+  <div class="auth-card">
+    <div class="auth-logo">
+      <a th:href="@{/}">FRAME<span>CUT</span></a>
+    </div>
+
+    <h2 class="auth-title">Welcome Back</h2>
+    <p class="auth-subtitle">Sign in to your cinema diary</p>
+
+    <!-- Flash success from register -->
+    <div th:if="${successParam}" class="flash-msg flash-success">
+      Account created! Please sign in.
+    </div>
+
+    <!-- Error -->
+    <div th:if="${error}" class="flash-msg flash-error" th:text="${error}">Error</div>
+
+    <form th:action="@{/auth/login}" method="post" th:object="${authRequest}">
+      <div class="form-group">
+        <label class="form-label" for="username">Username</label>
+        <input class="form-input" type="text" id="username" name="username"
+               placeholder="Enter your username" autocomplete="username" autofocus>
+        <div class="form-error" th:if="${#fields.hasErrors('username')}"
+             th:errors="*{username}"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-input" type="password" id="password" name="password"
+               placeholder="Enter your password" autocomplete="current-password">
+        <div class="form-error" th:if="${#fields.hasErrors('password')}"
+             th:errors="*{password}"></div>
+      </div>
+
+      <button type="submit" class="auth-submit">Sign In</button>
+    </form>
+
+    <div class="auth-switch">
+      Don't have an account? <a th:href="@{/auth/register}">Create one</a>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+<script>
+  // Build auth background
+  const container = document.getElementById('auth-bg-text');
+  for (let i = 0; i < 8; i++) {
+    const row = document.createElement('div');
+    row.className = 'auth-bg-row';
+    row.textContent = 'FRAMECUT '.repeat(10);
+    container.appendChild(row);
+  }
+  // Build loading marquee
+  const mc = document.getElementById('marquee-container');
+  if (mc) {
+    for (let i = 0; i < 7; i++) {
+      const row = document.createElement('div');
+      row.className = 'marquee-row' + (i === 3 ? ' highlight' : '');
+      const span = document.createElement('span');
+      span.textContent = 'FRAMECUT '.repeat(12);
+      row.appendChild(span);
+      mc.appendChild(row);
+    }
+  }
+</script>
+</body>
+</html>

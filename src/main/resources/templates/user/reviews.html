@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: layout(
+        'My Reviews',
+        ~{::main},
+        ~{::link[rel='stylesheet'][data-page]},
+        ~{::script[data-page]}
+      )}">
+<head>
+  <link rel="stylesheet" th:href="@{/css/main.css?v=2}" data-page>
+
+</head>
+<body>
+<main>
+  <div class="page-wrapper">
+    <div class="reviews-page-header">
+      <h1 class="reviews-page-title">
+        <span>/</span> My Reviews
+      </h1>
+      <p style="color:var(--text-secondary);margin-top:0.25rem;font-size:14px">
+        <span th:text="${totalReviews}">0</span> reviews written
+      </p>
+    </div>
+
+    <div class="reviews-grid" id="reviews-grid">
+      <a th:each="review, stat : ${reviews}"
+         th:href="@{/movies/{id}(id=${review.movie.id})}"
+         class="review-big-card"
+         th:style="${'animation-delay:' + stat.index * 0.06 + 's'}">
+        <img class="review-big-poster"
+             th:src="${review.movie.posterUrl}"
+             th:alt="${review.movie.title}"
+             onerror="this.src='/images/no-poster.jpg'">
+        <div class="review-big-body">
+          <div class="review-big-title" th:text="${review.movie.title}">Movie Title</div>
+          <div class="review-big-stars">
+            <span th:each="i : ${#numbers.sequence(1,5)}"
+                  th:text="${i <= review.rating ? '★' : '☆'}">★</span>
+          </div>
+          <div class="review-big-content"
+               th:text="${review.content != null ? review.content : 'No written review.'}">Content</div>
+          <div class="review-big-date"
+               th:text="${#temporals.format(review.createdAt, 'dd MMM yyyy')}">Date</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="load-more-trigger" id="load-more-trigger"
+         style="max-width:1000px;margin:0 auto"></div>
+
+    <div th:if="${reviews.isEmpty()}"
+         style="text-align:center;padding:5rem 2rem;color:var(--text-secondary)">
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--cream)">NO REVIEWS YET</p>
+      <p style="margin-top:0.5rem">Browse some films and share your thoughts.</p>
+      <a th:href="@{/}" class="btn-red" style="margin-top:1.5rem;display:inline-flex">Explore Films</a>
+    </div>
+  </div>
+</main>
+
+<script data-page>
+  // Infinite scroll for reviews
+  (function() {
+    const grid = document.getElementById('reviews-grid');
+    const trigger = document.getElementById('load-more-trigger');
+    if (!grid || !trigger) return;
+
+    let page = 0;
+    let loading = false;
+    let hasMore = true;
+
+    const loadMore = async () => {
+      if (loading || !hasMore) return;
+      loading = true;
+      trigger.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+
+      try {
+        const res = await fetch(`/api/my-reviews?page=${++page}`);
+        if (res.status === 401) { hasMore = false; trigger.innerHTML = ''; return; }
+        const data = await res.json();
+
+        data.content.forEach((review, i) => {
+          const card = document.createElement('a');
+          card.href = `/movies/${review.movieId}`;
+          card.className = 'review-big-card';
+          card.style.animationDelay = `${i * 0.06}s`;
+          const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+          card.innerHTML = `
+            <img class="review-big-poster" src="${review.moviePoster}"
+                 alt="${review.movieTitle}" onerror="this.src='/images/no-poster.jpg'">
+            <div class="review-big-body">
+              <div class="review-big-title">${review.movieTitle}</div>
+              <div class="review-big-stars">${stars}</div>
+              <div class="review-big-content">${review.content || 'No written review.'}</div>
+              <div class="review-big-date">${review.createdAt.substring(0,10)}</div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+        hasMore = data.hasMore;
+        trigger.innerHTML = hasMore ? '' : '<span style="opacity:0.3;font-size:12px;letter-spacing:0.1em">— END —</span>';
+      } catch(e) {
+        trigger.innerHTML = '';
+      }
+      loading = false;
+    };
+
+    const observer = new IntersectionObserver(e => {
+      if (e[0].isIntersecting) loadMore();
+    }, { rootMargin: '200px' });
+    observer.observe(trigger);
+  })();
+</script>
+</body>
+</html>

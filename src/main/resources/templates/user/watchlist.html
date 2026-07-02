@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(
+        'My Watchlist',
+        ~{::main},
+        ~{::link[rel='stylesheet'][data-page]},
+        ~{}
+      )}">
+<head>
+  <link rel="stylesheet" th:href="@{/css/main.css}" data-page>
+</head>
+<body>
+<main>
+  <div class="page-wrapper" style="padding-top:calc(var(--nav-height) + 2rem)">
+    <div class="container" style="margin-bottom:2rem">
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,60px);
+                 letter-spacing:0.04em;color:var(--cream);display:flex;align-items:center;gap:12px">
+        <span style="display:inline-block;width:6px;height:0.85em;background:var(--red);border-radius:2px;flex-shrink:0"></span>
+        My Watchlist
+      </h1>
+      <p style="color:var(--text-secondary);font-size:14px;margin-top:0.25rem">
+        <span th:text="${totalItems}">0</span> films saved
+      </p>
+    </div>
+
+    <div th:if="${!watchlist.isEmpty()}">
+      <div class="movie-grid container section visible" id="watchlist-grid">
+        <a th:each="item, stat : ${watchlist}"
+           th:href="@{/movies/{id}(id=${item.movie.id})}"
+           class="movie-card"
+           th:style="${'animation-delay:' + stat.index * 0.04 + 's'}">
+          <img class="movie-card-poster"
+               th:src="${item.movie.posterUrl}"
+               th:alt="${item.movie.title}"
+               loading="lazy"
+               onerror="this.src='/images/no-poster.jpg'">
+          <div class="movie-card-overlay">
+            <div class="movie-card-title" th:text="${item.movie.title}">Title</div>
+            <div class="movie-card-meta">
+              <span class="movie-card-rating"
+                    th:text="${item.movie.voteAverage != null ? '★ ' + #numbers.formatDecimal(item.movie.voteAverage,1,1) : 'N/A'}">★</span>
+              <span th:text="${item.movie.releaseYear}">2024</span>
+            </div>
+          </div>
+          <div class="movie-card-bottom">
+            <div class="movie-card-bottom-title" th:text="${item.movie.title}">Title</div>
+            <div class="movie-card-bottom-meta" th:text="${item.movie.releaseYear}">2024</div>
+          </div>
+        </a>
+      </div>
+      <div class="load-more-trigger" id="watchlist-load-trigger"></div>
+    </div>
+
+    <div th:if="${watchlist.isEmpty()}"
+         style="text-align:center;padding:5rem 2rem;color:var(--text-secondary)">
+      <p style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--cream)">
+        YOUR WATCHLIST IS EMPTY
+      </p>
+      <p style="margin-top:0.5rem">Start adding films you want to watch.</p>
+      <a th:href="@{/}" class="btn-red" style="margin-top:1.5rem;display:inline-flex">
+        Explore Films
+      </a>
+    </div>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — FrameCut</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" th:href="@{/css/main.css}">
+  <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+
+<div id="loading-screen">
+  <div class="marquee-container" id="marquee-container"></div>
+</div>
+
+<div class="auth-page">
+  <div class="auth-bg">
+    <div class="auth-bg-text" id="auth-bg-text"></div>
+    <div class="auth-overlay"></div>
+  </div>
+
+  <div class="auth-card">
+    <div class="auth-logo">
+      <a th:href="@{/}">FRAME<span>CUT</span></a>
+    </div>
+
+    <h2 class="auth-title">Create Account</h2>
+    <p class="auth-subtitle">Start your cinema diary today</p>
+
+    <div th:if="${error}" class="flash-msg flash-error" th:text="${error}">Error</div>
+
+    <form th:action="@{/auth/register}" method="post" th:object="${registerRequest}">
+      <div class="form-group">
+        <label class="form-label" for="username">Username</label>
+        <input class="form-input" type="text" id="username" name="username"
+               th:value="*{username}"
+               placeholder="Choose a username" autocomplete="username" autofocus>
+        <div class="form-error" th:if="${#fields.hasErrors('username')}"
+             th:errors="*{username}">Error</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-input" type="email" id="email" name="email"
+               th:value="*{email}"
+               placeholder="your@email.com" autocomplete="email">
+        <div class="form-error" th:if="${#fields.hasErrors('email')}"
+             th:errors="*{email}">Error</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-input" type="password" id="password" name="password"
+               placeholder="At least 6 characters" autocomplete="new-password">
+        <div class="form-error" th:if="${#fields.hasErrors('password')}"
+             th:errors="*{password}">Error</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="confirmPassword">Confirm Password</label>
+        <input class="form-input" type="password" id="confirmPassword"
+               placeholder="Repeat your password" autocomplete="new-password">
+      </div>
+
+      <button type="submit" class="auth-submit">Create Account</button>
+    </form>
+
+    <div class="auth-switch">
+      Already have an account? <a th:href="@{/auth/login}">Sign in</a>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/js/main.js}"></script>
+<script>
+  // Password confirmation check
+  const pw = document.getElementById('password');
+  const cpw = document.getElementById('confirmPassword');
+  const form = document.querySelector('form');
+
+  form.addEventListener('submit', e => {
+    if (pw.value !== cpw.value) {
+      e.preventDefault();
+      cpw.classList.add('error');
+      const err = document.createElement('div');
+      err.className = 'form-error';
+      err.textContent = 'Passwords do not match';
+      cpw.parentNode.appendChild(err);
+    }
+  });
+
+  // Auth bg
+  const container = document.getElementById('auth-bg-text');
+  for (let i = 0; i < 8; i++) {
+    const row = document.createElement('div');
+    row.className = 'auth-bg-row';
+    row.textContent = 'FRAMECUT '.repeat(10);
+    container.appendChild(row);
+  }
+  const mc = document.getElementById('marquee-container');
+  if (mc) {
+    for (let i = 0; i < 7; i++) {
+      const row = document.createElement('div');
+      row.className = 'marquee-row' + (i === 3 ? ' highlight' : '');
+      const span = document.createElement('span');
+      span.textContent = 'FRAMECUT '.repeat(12);
+      row.appendChild(span);
+      mc.appendChild(row);
+    }
+  }
+</script>
+</body>
+</html>

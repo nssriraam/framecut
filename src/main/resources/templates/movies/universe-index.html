@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(
+        'Director Universe',
+        ~{::main},
+        ~{::style[data-page]},
+        ~{::script[data-page]}
+      )}">
+<head>
+  <style data-page>
+    .universe-page {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .universe-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      letter-spacing: 0.05em;
+      color: #f0ece0;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .universe-subtitle {
+      text-align: center;
+      color: rgba(240,236,224,0.6);
+      margin-bottom: 4rem;
+      font-size: 18px;
+    }
+    .director-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    .director-card {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 2/3;
+      background: #111;
+      text-decoration: none;
+      display: block;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .director-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(229, 9, 20, 0.3);
+    }
+    .director-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+    }
+    .director-card:hover img {
+      opacity: 1;
+    }
+    .director-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+      padding: 1.5rem 1rem 1rem 1rem;
+    }
+    .director-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      color: white;
+      letter-spacing: 0.05em;
+      line-height: 1.1;
+    }
+    
+    .search-box {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 4rem;
+    }
+    .search-input {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 30px 0 0 30px;
+      font-family: 'Barlow', sans-serif;
+      width: 300px;
+      outline: none;
+      font-size: 16px;
+    }
+    .search-btn {
+      background: var(--red);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 0 30px 30px 0;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="universe-page">
+    <h1 class="universe-title">The Cinematic Universe</h1>
+    <p class="universe-subtitle">Step into the intricate webs of the world's greatest filmmakers.</p>
+    
+    <div class="search-box">
+      <div style="position:relative">
+        <input type="text" id="dir-search" class="search-input" placeholder="Search any director..." autocomplete="off" onkeydown="if(event.key==='Enter') searchDir()">
+        <div class="autocomplete-results" id="dir-autocomplete-results" style="left:0;right:0;width:100%;top:100%;margin-top:5px;border-radius:12px;overflow:hidden;text-align:left;position:absolute;z-index:9999"></div>
+      </div>
+      <button class="search-btn" onclick="searchDir()">Explore</button>
+    </div>
+
+    <div class="director-grid">
+      <a th:each="dir : ${directors}" th:href="@{/universe(director=${dir.name})}" class="director-card">
+        <img th:src="${dir.profilePath != null ? 'https://image.tmdb.org/t/p/w500' + dir.profilePath : '/images/no-poster.jpg'}" th:alt="${dir.name}" class="director-img-tag" style="opacity: 0.8; transition: opacity 0.5s" onerror="this.src='/images/no-poster.jpg'">
+        <div class="director-overlay"><div class="director-name" th:text="${dir.name}">Director</div></div>
+      </a>
+    </div>
+  </div>
+</main>
+<script data-page>
+  function searchDir() {
+    const val = document.getElementById('dir-search').value.trim();
+    if(val) window.location.href = '/universe?director=' + encodeURIComponent(val);
+  }
+
+  // Live director search / autocomplete
+  (function() {
+    const input = document.getElementById('dir-search');
+    const results = document.getElementById('dir-autocomplete-results');
+    if (!input || !results) return;
+
+    let debounceTimer;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      clearTimeout(debounceTimer);
+
+      if (q.length < 2) {
+        results.classList.remove('show');
+        results.innerHTML = '';
+        return;
+      }
+
+      debounceTimer = setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/search/directors?q=${encodeURIComponent(q)}`);
+          const data = await res.json();
+
+          if (!data.length) {
+            results.classList.remove('show');
+            return;
+          }
+
+          results.innerHTML = data.map((item, i) => `
+            <a href="/universe?director=${encodeURIComponent(item.name)}" class="autocomplete-item" style="animation-delay:${i*0.05}s">
+              <img src="${item.profilePath ? 'https://image.tmdb.org/t/p/w185' + item.profilePath : '/images/no-poster.jpg'}" alt="${item.name}" onerror="this.src='/images/no-poster.jpg'">
+              <div class="autocomplete-item-info">
+                <div class="autocomplete-item-title">${escapeHtml(item.name)}</div>
+                <div class="autocomplete-item-meta">Director</div>
+              </div>
+            </a>
+          `).join('');
+
+          results.classList.add('show');
+        } catch (e) {
+          console.error('Director Autocomplete error:', e);
+        }
+      }, 300);
+    });
+
+    // Enter key → search page
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && input.value.trim()) {
+        searchDir();
+      }
+      if (e.key === 'Escape') {
+        results.classList.remove('show');
+        input.blur();
+      }
+    });
+
+    // Close on outside click
+    document.addEventListener('click', e => {
+      if (!input.contains(e.target) && !results.contains(e.target)) {
+        results.classList.remove('show');
+      }
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: layout(
+        'Search',
+        ~{::main},
+        ~{::link[rel='stylesheet'][data-page]},
+        ~{::script[data-page]}
+      )}">
+<head>
+  <link rel="stylesheet" th:href="@{/css/main.css}" data-page>
+  <style data-page>
+    .search-bar-big {
+      position: relative;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+    .search-bar-big input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 2px solid rgba(211,14,23,0.4);
+      border-radius: 6px;
+      color: var(--text-primary);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 0.9rem 1rem 0.9rem 3.5rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .search-bar-big input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 4px var(--red-glow);
+      background: rgba(255,255,255,0.08);
+    }
+    .search-bar-big .search-icon-big {
+      position: absolute;
+      left: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 22px;
+      color: var(--red);
+      pointer-events: none;
+    }
+
+    .filters-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .filter-select {
+      background: #1a1814;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px;
+      color: #f0ece0;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 0.45rem 0.9rem;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .filter-select:focus { border-color: var(--red); }
+
+    .results-count {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+    }
+    .results-count strong { color: var(--cream); }
+
+    .search-empty {
+      text-align: center;
+      padding: 5rem 2rem;
+      color: var(--text-secondary);
+    }
+    .search-empty .empty-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      color: var(--cream);
+      margin-bottom: 0.5rem;
+    }
+    select.filter-select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background: #1a1814 !important;
+      color: #f0ece0 !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+      border-radius: 4px;
+      padding: 0.45rem 0.9rem;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    select.filter-select option {
+      background: #1a1814;
+      color: #f0ece0;
+    }
+  </style>
+</head>
+<body>
+<main>
+  <div class="page-wrapper" style="padding-top:calc(var(--nav-height) + 3rem)">
+    <div class="container">
+
+      <!-- Big search bar -->
+      <form method="get" action="/search" id="search-form">
+        <div class="search-bar-big" style="display:none">
+          <span class="search-icon-big">🔍</span>
+          <input type="text" name="q" id="search-input-big"
+                 th:value="${query}"
+                 placeholder="Search films, series..."
+                 autocomplete="off" autofocus>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar" style="display:none">
+          <select name="type" class="filter-select">
+            <option value="" th:selected="${type == null}">All Types</option>
+            <option value="movie" th:selected="${type == 'movie'}">Movies</option>
+            <option value="tv" th:selected="${type == 'tv'}">Series</option>
+          </select>
+
+          <select name="genre" class="filter-select">
+            <option value="" th:selected="${genre == null}">All Genres</option>
+            <option th:each="g : ${genres}" th:value="${g}" th:text="${g}"
+                    th:selected="${genre == g}">Genre</option>
+          </select>
+
+          <select name="yearFrom" class="filter-select">
+            <option value="" th:selected="${yearFrom == null}">From Year</option>
+            <option th:each="y : ${#numbers.sequence(2024, 2000, -1)}"
+                    th:value="${y}" th:text="${y}"
+                    th:selected="${yearFrom == y}">2024</option>
+          </select>
+
+          <select name="yearTo" class="filter-select">
+            <option value="" th:selected="${yearTo == null}">To Year</option>
+            <option th:each="y : ${#numbers.sequence(2024, 2000, -1)}"
+                    th:value="${y}" th:text="${y}"
+                    th:selected="${yearTo == y}">2024</option>
+          </select>
+
+          <select name="ratingMin" class="filter-select">
+            <option value="" th:selected="${ratingMin == null}">Min Rating</option>
+            <option value="9" th:selected="${ratingMin == 9}">★ 9+</option>
+            <option value="8" th:selected="${ratingMin == 8}">★ 8+</option>
+            <option value="7" th:selected="${ratingMin == 7}">★ 7+</option>
+            <option value="6" th:selected="${ratingMin == 6}">★ 6+</option>
+            <option value="5" th:selected="${ratingMin == 5}">★ 5+</option>
+          </select>
+
+          <select name="sortBy" class="filter-select">
+            <option value="popularity" th:selected="${sortBy == 'popularity'}">Most Popular</option>
+            <option value="rating" th:selected="${sortBy == 'rating'}">Top Rated</option>
+            <option value="year" th:selected="${sortBy == 'year'}">Newest First</option>
+            <option value="title" th:selected="${sortBy == 'title'}">A–Z</option>
+          </select>
+
+          <button type="submit" class="btn-red" style="padding:0.45rem 1.5rem">Search</button>
+        </div>
+      </form>
+
+      <!-- Results count -->
+      <div class="results-count" style="display:none" th:if="${query != null and !query.isEmpty()}">
+        <strong th:text="${totalResults}">0</strong> results for
+        "<strong th:text="${query}">query</strong>"
+      </div>
+
+      <!-- Results grid -->
+      <div th:if="${!movies.isEmpty()}">
+        <div class="movie-grid section visible" id="search-results-grid"
+             style="padding:0;max-width:100%">
+          <a th:each="movie, stat : ${movies}"
+             th:href="@{/movies/{id}(id=${movie.id})}"
+             class="movie-card"
+             th:style="${'animation-delay:' + stat.index * 0.04 + 's'}">
+            <img class="movie-card-poster"
+                 th:src="${movie.posterUrl}"
+                 th:alt="${movie.title}"
+                 loading="lazy"
+                 onerror="this.src='/images/no-poster.jpg'">
+            <div class="movie-card-overlay">
+              <div class="movie-card-title" th:text="${movie.title}">Title</div>
+              <div class="movie-card-meta">
+                <span class="movie-card-rating"
+                      th:text="${movie.voteAverage != null ? '★ ' + #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'}">★</span>
+                <span th:text="${movie.releaseYear}">2024</span>
+              </div>
+            </div>
+            <div class="movie-card-bottom">
+              <div class="movie-card-bottom-title" th:text="${movie.title}">Title</div>
+              <div class="movie-card-bottom-meta">
+                <span th:text="${movie.releaseYear}">2024</span>
+                <span th:if="${movie.genreNames != null and !movie.genreNames.isEmpty()}"
+                      th:text="' · ' + ${movie.firstTwoGenres}"></span>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Infinite scroll for search -->
+        <div class="load-more-trigger" id="load-more-trigger"></div>
+      </div>
+
+      <!-- Empty state -->
+      <div th:if="${movies.isEmpty()}" class="search-empty">
+        <div class="empty-title">NO RESULTS</div>
+        <p>Try a different search term or adjust your filters.</p>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script data-page th:inline="javascript">
+  // Live search on typing with debounce
+  const input = document.getElementById('search-input-big');
+  const form = document.getElementById('search-form');
+  let debounce;
+
+  input?.addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(() => {
+      if (input.value.trim().length >= 2) form.submit();
+    }, 500);
+  });
+
+  // Infinite scroll params for search
+  window.infiniteScrollParams = {
+    query: /*[[${query}]]*/ '',
+    type: /*[[${type}]]*/ null,
+    genre: /*[[${genre}]]*/ null,
+    section: 'search'
+  };
+</script>
+</body>
+</html>
