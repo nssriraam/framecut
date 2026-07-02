@@ -2,7 +2,7 @@
 
 ![FrameCut Banner](docs/screenshot.png)
 
-**[🔴 Live Website (Click Here)](#)** *(Replace this with your deployed link!)*
+**[🔴 Live Website (Click Here)](https://framecut-kmem.onrender.com/)** *(Replace this with your deployed link!)*
 
 Welcome to **FrameCut**, a premium, full-stack movie and TV series discovery platform designed for true cinephiles. Inspired by platforms like Letterboxd and IMDb, FrameCut goes beyond simple databases to offer a personalized, visually stunning experience for exploring cinema.
 
