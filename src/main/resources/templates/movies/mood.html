@@ -284,10 +284,10 @@
       // Spawn emoji particles rising from bottom
       spawnParticles(emoji, 25);
 
-      // Navigate — start loading while particles are still flying
+      // Navigate early — page loads while particles are still mid-flight
       setTimeout(function() {
         window.location.href = href;
-      }, 700);
+      }, 300);
     });
   });
 })();
