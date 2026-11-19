@@ -148,7 +148,7 @@ public class MovieService {
 
     public Page<Movie> getByMood(String mood, int page, int size) {
         String genre;
-        String excludeGenre;
+        String excludeGenre = null;
         switch (mood.toLowerCase()) {
             case "thrilled" -> {
                 genre = "Action";
@@ -172,11 +172,9 @@ public class MovieService {
             }
             case "inspired" -> {
                 genre = "History";
-                excludeGenre = "NONE";
             }
             case "nostalgic" -> {
                 genre = "Family";
-                excludeGenre = "NONE";
             }
             case "adrenaline" -> {
                 genre = "Action";
@@ -188,10 +186,13 @@ public class MovieService {
             }
             default -> {
                 genre = "Action";
-                excludeGenre = "NONE";
             }
         }
-        return movieRepository.findByMood(genre, excludeGenre, PageRequest.of(page, size));
+        Pageable pageable = PageRequest.of(page, size);
+        if (excludeGenre != null && !excludeGenre.isBlank()) {
+            return movieRepository.findByMoodWithExclude(genre, excludeGenre, pageable);
+        }
+        return movieRepository.findByMood(genre, pageable);
     }
 
     public Movie save(Movie movie) {

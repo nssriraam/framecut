@@ -100,10 +100,15 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     Page<Movie> findHiddenGems(Pageable pageable);
 
     @Query("SELECT m FROM Movie m WHERE m.posterPath IS NOT NULL AND m.posterPath != '' AND m.popularity >= 5.0 AND " +
+           "LOWER(CONCAT(',', REPLACE(m.genreNames, ', ', ','), ',')) LIKE LOWER(CONCAT('%,', :genre, ',%')) " +
+           "ORDER BY m.popularity DESC, m.voteAverage DESC, m.id DESC")
+    Page<Movie> findByMood(@Param("genre") String genre, Pageable pageable);
+
+    @Query("SELECT m FROM Movie m WHERE m.posterPath IS NOT NULL AND m.posterPath != '' AND m.popularity >= 5.0 AND " +
            "LOWER(CONCAT(',', REPLACE(m.genreNames, ', ', ','), ',')) LIKE LOWER(CONCAT('%,', :genre, ',%')) AND " +
-           "(:excludeGenre = 'NONE' OR LOWER(CONCAT(',', REPLACE(m.genreNames, ', ', ','), ',')) NOT LIKE LOWER(CONCAT('%,', :excludeGenre, ',%'))) " +
-           "ORDER BY m.voteAverage DESC, m.popularity DESC, m.id DESC")
-    Page<Movie> findByMood(@Param("genre") String genre,
-                           @Param("excludeGenre") String excludeGenre,
-                           Pageable pageable);
+           "LOWER(CONCAT(',', REPLACE(m.genreNames, ', ', ','), ',')) NOT LIKE LOWER(CONCAT('%,', :excludeGenre, ',%')) " +
+           "ORDER BY m.popularity DESC, m.voteAverage DESC, m.id DESC")
+    Page<Movie> findByMoodWithExclude(@Param("genre") String genre,
+                                      @Param("excludeGenre") String excludeGenre,
+                                      Pageable pageable);
 }
