@@ -242,13 +242,12 @@
     }
   </style>
 </head>
-
 <body>
-  <main>
-    <div class="page-wrapper">
-      <div class="mood-page">
-        <h1 class="mood-title">What's Your <span>Mood</span>?</h1>
-        <p class="mood-subtitle">Pick a feeling — we'll find the perfect film</p>
+<main>
+  <div class="page-wrapper">
+    <div class="mood-page">
+      <h1 class="mood-title">What's Your <span>Mood</span>?</h1>
+      <p class="mood-subtitle">Pick a feeling — we'll find the perfect film</p>
 
       <div class="mood-grid">
         <a th:href="@{/mood/thrilled}" class="mood-card" data-mood="thrilled">
@@ -357,14 +356,13 @@
         clone.classList.add('animate-' + mood);
       }, 350);
 
-      // Phase 3: Trigger navigation so new page paints right when animation finishes
+      // Phase 3: Trigger navigation at 400ms so new page loads right on cue
       setTimeout(function() {
         window.location.href = href;
-      }, 500);
+      }, 400);
     });
   });
 })();
 </script>
 </body>
-
 </html>
