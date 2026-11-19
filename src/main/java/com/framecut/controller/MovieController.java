@@ -65,6 +65,10 @@ public class MovieController {
         if (movieOpt.isEmpty()) return "redirect:/";
 
         Movie movie = movieOpt.get();
+
+        // Lazy-enrich: fetch credits/trailer from TMDB only once, then persist to DB
+        tmdbService.enrichMovieDetails(movie);
+
         Page<Review> reviews = reviewService.getMovieReviews(id, reviewPage, 10);
         Double avgRating = reviewService.getAverageRating(id);
 
@@ -81,9 +85,9 @@ public class MovieController {
             movie.getGenreNames(), 
             movie.getType(), 
             movie.getOriginalLanguage()));
-        model.addAttribute("cast", tmdbService.getMovieCast(movie.getTmdbId(), movie.getType()));
-        model.addAttribute("directorName", tmdbService.getMovieDirector(movie.getTmdbId(), movie.getType()));
-        model.addAttribute("trailerKey", tmdbService.getMovieTrailer(movie.getTmdbId(), movie.getType()));
+        model.addAttribute("cast", tmdbService.parseCastJson(movie.getCastJson()));
+        model.addAttribute("directorName", movie.getDirector());
+        model.addAttribute("trailerKey", movie.getTrailerKey());
 
         if (auth != null && auth.isAuthenticated()) {
             try {

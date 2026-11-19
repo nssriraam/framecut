@@ -13,7 +13,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
   thymeleaf:
-    cache: false
+    cache: true
     prefix: classpath:/templates/
     suffix: .html
 

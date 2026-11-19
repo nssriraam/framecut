@@ -18,6 +18,11 @@ public class MovieService {
     private final ReviewRepository reviewRepository;
     private final TmdbService tmdbService;
 
+    // Genre cache (refresh every hour)
+    private volatile List<String> genreCache;
+    private volatile long genreCacheTimestamp = 0;
+    private static final long GENRE_CACHE_TTL = 3600_000L; // 1 hour
+
     public Page<Movie> getTrending(int page, int size) {
         return movieRepository.findAllTrending(PageRequest.of(page, size));
     }
@@ -93,6 +98,10 @@ public class MovieService {
     }
 
     public List<String> getAllGenres() {
+        long now = System.currentTimeMillis();
+        if (genreCache != null && (now - genreCacheTimestamp) < GENRE_CACHE_TTL) {
+            return genreCache;
+        }
         Set<String> genres = new TreeSet<>();
         List<String> raw = movieRepository.findAllGenreNames();
         for (String genreStr : raw) {
@@ -103,7 +112,9 @@ public class MovieService {
                     .forEach(genres::add);
             }
         }
-        return new ArrayList<>(genres);
+        genreCache = new ArrayList<>(genres);
+        genreCacheTimestamp = now;
+        return genreCache;
     }
 
     public Map<String, Object> getStats() {

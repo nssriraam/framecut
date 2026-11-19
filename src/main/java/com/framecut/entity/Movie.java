@@ -12,7 +12,9 @@ import java.util.List;
     @Index(name = "idx_movie_title", columnList = "title"),
     @Index(name = "idx_movie_type", columnList = "type"),
     @Index(name = "idx_movie_release_year", columnList = "releaseYear"),
-    @Index(name = "idx_movie_vote_average", columnList = "voteAverage")
+    @Index(name = "idx_movie_vote_average", columnList = "voteAverage"),
+    @Index(name = "idx_movie_popularity", columnList = "popularity"),
+    @Index(name = "idx_movie_type_popularity", columnList = "type,popularity")
 })
 @Data
 @NoArgsConstructor
@@ -55,6 +57,11 @@ public class Movie {
 
     @Column(length = 1000)
     private String genreNames;
+
+    private String trailerKey;
+
+    @Column(columnDefinition = "TEXT")
+    private String castJson;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default

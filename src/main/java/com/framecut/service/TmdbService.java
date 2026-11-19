@@ -11,6 +11,9 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.util.*;
+import jakarta.annotation.PostConstruct;
+import java.util.concurrent.CompletableFuture;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +22,8 @@ public class TmdbService {
 
     private final MovieRepository movieRepository;
     private final WebClient.Builder webClientBuilder;
+    private WebClient webClient;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${tmdb.api-key}")
     private String apiKey;
@@ -31,16 +36,95 @@ public class TmdbService {
 
     private final Map<String, Map<String, Object>> creditsCache = new java.util.concurrent.ConcurrentHashMap<>();
     private final Map<String, String> trailerCache = new java.util.concurrent.ConcurrentHashMap<>();
-    
+
+    @PostConstruct
+    public void init() {
+        this.webClient = webClientBuilder
+            .baseUrl(baseUrl)
+            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
+            .build();
+    }
+
     public String getApiKey() {
         return apiKey;
     }
 
     public WebClient getClient() {
-        return webClientBuilder
-            .baseUrl(baseUrl)
-            .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
-            .build();
+        return webClient;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void enrichMovieDetails(Movie movie) {
+        boolean needsCredits = (movie.getDirector() == null || movie.getCastJson() == null);
+        boolean needsTrailer = (movie.getTrailerKey() == null);
+
+        if (!needsCredits && !needsTrailer) return;
+
+        try {
+            CompletableFuture<Void> creditsFuture = CompletableFuture.completedFuture(null);
+            CompletableFuture<Void> trailerFuture = CompletableFuture.completedFuture(null);
+
+            if (needsCredits) {
+                creditsFuture = CompletableFuture.runAsync(() -> {
+                    try {
+                        Map<String, Object> credits = getCredits(movie.getTmdbId(), movie.getType());
+                        if (credits != null && credits.containsKey("crew")) {
+                            List<Map<String, Object>> crew = (List<Map<String, Object>>) credits.get("crew");
+                            for (Map<String, Object> member : crew) {
+                                if ("Director".equals(member.get("job"))) {
+                                    movie.setDirector((String) member.get("name"));
+                                    break;
+                                }
+                            }
+                        }
+                        if (credits != null && credits.containsKey("cast")) {
+                            List<Map<String, Object>> cast = (List<Map<String, Object>>) credits.get("cast");
+                            List<Map<String, Object>> topCast = cast.stream().limit(15).map(c -> {
+                                Map<String, Object> slim = new HashMap<>();
+                                slim.put("id", c.get("id"));
+                                slim.put("name", c.get("name"));
+                                slim.put("character", c.get("character"));
+                                slim.put("profile_path", c.get("profile_path"));
+                                return slim;
+                            }).toList();
+                            try {
+                                movie.setCastJson(objectMapper.writeValueAsString(topCast));
+                            } catch (Exception ignored) {}
+                        }
+                    } catch (Exception e) {
+                        log.error("Failed to enrich credits for {}: {}", movie.getTmdbId(), e.getMessage());
+                    }
+                });
+            }
+
+            if (needsTrailer) {
+                trailerFuture = CompletableFuture.runAsync(() -> {
+                    try {
+                        String key = getMovieTrailer(movie.getTmdbId(), movie.getType());
+                        if (key != null) {
+                            movie.setTrailerKey(key);
+                        }
+                    } catch (Exception e) {
+                        log.error("Failed to enrich trailer for {}: {}", movie.getTmdbId(), e.getMessage());
+                    }
+                });
+            }
+
+            CompletableFuture.allOf(creditsFuture, trailerFuture).join();
+            movieRepository.save(movie);
+        } catch (Exception e) {
+            log.error("Failed to enrich movie {}: {}", movie.getTmdbId(), e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> parseCastJson(String castJson) {
+        if (castJson == null || castJson.isBlank()) return List.of();
+        try {
+            return objectMapper.readValue(castJson, List.class);
+        } catch (Exception e) {
+            return List.of();
+        }
     }
 
     public void fetchMovies(int startPage, int endPage) {
