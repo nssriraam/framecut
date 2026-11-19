@@ -300,6 +300,14 @@
 
 <script data-page>
 (function() {
+  // Clean up on back-button navigation (bfcache restore)
+  window.addEventListener('pageshow', function(e) {
+    var overlay = document.getElementById('mood-overlay');
+    if (overlay) overlay.classList.remove('active');
+    document.querySelectorAll('.mood-fly-emoji').forEach(function(el) { el.remove(); });
+    document.querySelectorAll('.mood-emoji').forEach(function(el) { el.style.opacity = ''; });
+  });
+
   document.querySelectorAll('.mood-card').forEach(function(card) {
     card.addEventListener('click', function(e) {
       e.preventDefault();
@@ -325,7 +333,7 @@
       // Hide the original emoji
       emojiEl.style.opacity = '0';
 
-      // Phase 1: Fly to center + grow (after a tiny repaint delay)
+      // Phase 1: Fly to center + grow
       requestAnimationFrame(function() {
         requestAnimationFrame(function() {
           clone.classList.add('flying');
@@ -339,12 +347,12 @@
       setTimeout(function() {
         clone.classList.remove('flying');
         clone.classList.add('animate-' + mood);
-      }, 550);
+      }, 500);
 
-      // Phase 3: Navigate
+      // Phase 3: Navigate early so page loads while animation finishes
       setTimeout(function() {
         window.location.href = href;
-      }, 1300);
+      }, 850);
     });
   });
 })();
