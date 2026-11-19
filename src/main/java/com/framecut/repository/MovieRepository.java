@@ -101,7 +101,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     @Query("SELECT m FROM Movie m WHERE m.posterPath IS NOT NULL AND m.posterPath != '' AND m.popularity >= 5.0 AND " +
            "LOWER(CONCAT(',', REPLACE(m.genreNames, ', ', ','), ',')) LIKE LOWER(CONCAT('%,', :genre, ',%')) AND " +
-           "(:excludeGenre IS NULL OR LOWER(CONCAT(',', REPLACE(m.genreNames, ', ', ','), ',')) NOT LIKE LOWER(CONCAT('%,', :excludeGenre, ',%'))) " +
+           "(:excludeGenre = 'NONE' OR LOWER(CONCAT(',', REPLACE(m.genreNames, ', ', ','), ',')) NOT LIKE LOWER(CONCAT('%,', :excludeGenre, ',%'))) " +
            "ORDER BY m.voteAverage DESC, m.popularity DESC, m.id DESC")
     Page<Movie> findByMood(@Param("genre") String genre,
                            @Param("excludeGenre") String excludeGenre,

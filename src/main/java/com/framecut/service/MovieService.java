@@ -172,11 +172,11 @@ public class MovieService {
             }
             case "inspired" -> {
                 genre = "History";
-                excludeGenre = null;
+                excludeGenre = "NONE";
             }
             case "nostalgic" -> {
                 genre = "Family";
-                excludeGenre = null;
+                excludeGenre = "NONE";
             }
             case "adrenaline" -> {
                 genre = "Action";
@@ -188,7 +188,7 @@ public class MovieService {
             }
             default -> {
                 genre = "Action";
-                excludeGenre = null;
+                excludeGenre = "NONE";
             }
         }
         return movieRepository.findByMood(genre, excludeGenre, PageRequest.of(page, size));
