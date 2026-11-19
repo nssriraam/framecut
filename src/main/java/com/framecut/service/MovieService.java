@@ -147,20 +147,51 @@ public class MovieService {
     }
 
     public Page<Movie> getByMood(String mood, int page, int size) {
-        String genre = switch (mood.toLowerCase()) {
-            case "thrilled"  -> "Action";
-            case "emotional" -> "Drama";
-            case "mindblow"  -> "Science Fiction";
-            case "feelgood"  -> "Comedy";
-            case "scared"    -> "Horror";
-            case "inspired"  -> "History";
-            case "nostalgic" -> "Family";
-            case "adrenaline"-> "Action";
-            case "cozy"      -> "Romance";
-            default          -> "Action";
-        };
-        return movieRepository.findByGenre(genre, PageRequest.of(page, size,
-            Sort.by("popularity").descending().and(Sort.by("id").descending())));
+        String genre;
+        String excludeGenre;
+        switch (mood.toLowerCase()) {
+            case "thrilled" -> {
+                genre = "Action";
+                excludeGenre = "Animation";
+            }
+            case "emotional" -> {
+                genre = "Drama";
+                excludeGenre = "Comedy";
+            }
+            case "mindblow" -> {
+                genre = "Science Fiction";
+                excludeGenre = "Animation";
+            }
+            case "feelgood" -> {
+                genre = "Comedy";
+                excludeGenre = "Horror";
+            }
+            case "scared" -> {
+                genre = "Horror";
+                excludeGenre = "Animation";
+            }
+            case "inspired" -> {
+                genre = "History";
+                excludeGenre = null;
+            }
+            case "nostalgic" -> {
+                genre = "Family";
+                excludeGenre = null;
+            }
+            case "adrenaline" -> {
+                genre = "Action";
+                excludeGenre = "Family";
+            }
+            case "cozy" -> {
+                genre = "Romance";
+                excludeGenre = "Horror";
+            }
+            default -> {
+                genre = "Action";
+                excludeGenre = null;
+            }
+        }
+        return movieRepository.findByMood(genre, excludeGenre, PageRequest.of(page, size));
     }
 
     public Movie save(Movie movie) {

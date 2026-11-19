@@ -92,6 +92,7 @@ public class SearchController {
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String genre,
+            @RequestParam(required = false) String mood,
             @RequestParam(defaultValue = "trending") String section) {
 
         Page<Movie> movies;
@@ -101,6 +102,7 @@ public class SearchController {
             case "toprated" -> movies = movieService.getTopRated(page, size);
             case "series" -> movies = movieService.getAllSeries(page, size);
             case "hiddengems" -> movies = movieService.getHiddenGems(page, size);
+            case "mood" -> movies = movieService.getByMood(mood != null ? mood : "thrilled", page, size);
             default -> {
                 if (genre != null && !genre.isBlank()) {
                     movies = movieService.getByGenre(genre, type, page, size);

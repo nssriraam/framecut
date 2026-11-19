@@ -196,7 +196,8 @@ document.querySelectorAll('.row-arrow').forEach(btn => {
         size: 20,
         ...(params.type && { type: params.type }),
         ...(params.genre && { genre: params.genre }),
-        ...(params.section && { section: params.section })
+        ...(params.section && { section: params.section }),
+        ...(params.mood && { mood: params.mood })
       });
 
       const res = await fetch(`/api/movies?${queryParams}`);

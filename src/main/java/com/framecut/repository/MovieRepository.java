@@ -98,4 +98,12 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
            "m.voteAverage >= 7.5 AND m.voteCount <= 1000 AND m.voteCount >= 50 " +
            "ORDER BY m.voteAverage DESC, m.id DESC")
     Page<Movie> findHiddenGems(Pageable pageable);
+
+    @Query("SELECT m FROM Movie m WHERE m.posterPath IS NOT NULL AND m.posterPath != '' AND m.popularity >= 5.0 AND " +
+           "LOWER(CONCAT(',', REPLACE(m.genreNames, ', ', ','), ',')) LIKE LOWER(CONCAT('%,', :genre, ',%')) AND " +
+           "(:excludeGenre IS NULL OR LOWER(CONCAT(',', REPLACE(m.genreNames, ', ', ','), ',')) NOT LIKE LOWER(CONCAT('%,', :excludeGenre, ',%'))) " +
+           "ORDER BY m.voteAverage DESC, m.popularity DESC, m.id DESC")
+    Page<Movie> findByMood(@Param("genre") String genre,
+                           @Param("excludeGenre") String excludeGenre,
+                           Pageable pageable);
 }
