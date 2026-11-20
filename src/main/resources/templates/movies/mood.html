@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragments/layout :: layout(
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(
         'What are you in the mood for?',
         ~{::main},
         ~{::style[data-page]},
         ~{::script[data-page]}
       )}">
+
 <head>
   <style data-page>
     .mood-page {
@@ -26,7 +26,9 @@
       margin-bottom: 0.5rem;
     }
 
-    .mood-title span { color: var(--red); }
+    .mood-title span {
+      color: var(--red);
+    }
 
     .mood-subtitle {
       color: var(--text-secondary);
@@ -44,7 +46,9 @@
     }
 
     @media (max-width: 600px) {
-      .mood-grid { grid-template-columns: repeat(2, 1fr); }
+      .mood-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
     .mood-card {
@@ -76,17 +80,45 @@
       border-color: rgba(255, 255, 255, 0.2);
     }
 
-    .mood-card:hover::before { opacity: 1; }
+    .mood-card:hover::before {
+      opacity: 1;
+    }
 
-    .mood-card[data-mood="thrilled"]::before   { background: linear-gradient(135deg, rgba(211, 14, 23, 0.2), transparent); }
-    .mood-card[data-mood="emotional"]::before  { background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), transparent); }
-    .mood-card[data-mood="mindblow"]::before   { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), transparent); }
-    .mood-card[data-mood="feelgood"]::before   { background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), transparent); }
-    .mood-card[data-mood="scared"]::before     { background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), transparent); }
-    .mood-card[data-mood="inspired"]::before   { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), transparent); }
-    .mood-card[data-mood="nostalgic"]::before  { background: linear-gradient(135deg, rgba(217, 70, 239, 0.2), transparent); }
-    .mood-card[data-mood="adrenaline"]::before { background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), transparent); }
-    .mood-card[data-mood="cozy"]::before       { background: linear-gradient(135deg, rgba(251, 146, 60, 0.2), transparent); }
+    .mood-card[data-mood="thrilled"]::before {
+      background: linear-gradient(135deg, rgba(211, 14, 23, 0.2), transparent);
+    }
+
+    .mood-card[data-mood="emotional"]::before {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), transparent);
+    }
+
+    .mood-card[data-mood="mindblow"]::before {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), transparent);
+    }
+
+    .mood-card[data-mood="feelgood"]::before {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), transparent);
+    }
+
+    .mood-card[data-mood="scared"]::before {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), transparent);
+    }
+
+    .mood-card[data-mood="inspired"]::before {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), transparent);
+    }
+
+    .mood-card[data-mood="nostalgic"]::before {
+      background: linear-gradient(135deg, rgba(217, 70, 239, 0.2), transparent);
+    }
+
+    .mood-card[data-mood="adrenaline"]::before {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), transparent);
+    }
+
+    .mood-card[data-mood="cozy"]::before {
+      background: linear-gradient(135deg, rgba(251, 146, 60, 0.2), transparent);
+    }
 
     .mood-emoji {
       font-size: 42px;
@@ -126,6 +158,7 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
+
     .mood-overlay.active {
       opacity: 1;
       pointer-events: all;
@@ -155,214 +188,370 @@
     .mood-fly-emoji.animate-scared {
       animation: fly-ghost 1.0s ease forwards;
     }
+
     @keyframes fly-ghost {
-      0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      18%  { transform: translate(-50%, -50%) scale(1.12) translateX(-20px); opacity: 0.85; }
-      36%  { transform: translate(-50%, -50%) scale(1.08) translateX(16px); opacity: 1; }
-      60%  { transform: translate(-50%, -50%) scale(1.22) translateY(-32px); opacity: 0.7; }
-      80%  { transform: translate(-50%, -50%) scale(1.35) translateY(-60px); opacity: 0.35; }
-      100% { transform: translate(-50%, -50%) scale(1.45) translateY(-90px); opacity: 0; }
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+
+      18% {
+        transform: translate(-50%, -50%) scale(1.12) translateX(-20px);
+        opacity: 0.85;
+      }
+
+      36% {
+        transform: translate(-50%, -50%) scale(1.08) translateX(16px);
+        opacity: 1;
+      }
+
+      60% {
+        transform: translate(-50%, -50%) scale(1.22) translateY(-32px);
+        opacity: 0.7;
+      }
+
+      80% {
+        transform: translate(-50%, -50%) scale(1.35) translateY(-60px);
+        opacity: 0.35;
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(1.45) translateY(-90px);
+        opacity: 0;
+      }
     }
 
     .mood-fly-emoji.animate-cozy {
       animation: fly-coffee 1.0s ease forwards;
     }
+
     @keyframes fly-coffee {
-      0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      35%  { transform: translate(-50%, -50%) scale(1.12) translateY(-8px); opacity: 1; }
-      65%  { transform: translate(-50%, -50%) scale(1.18) translateY(-22px); opacity: 0.75; }
-      85%  { transform: translate(-50%, -50%) scale(1.24) translateY(-38px); opacity: 0.35; }
-      100% { transform: translate(-50%, -50%) scale(1.3) translateY(-55px); opacity: 0; }
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+
+      35% {
+        transform: translate(-50%, -50%) scale(1.12) translateY(-8px);
+        opacity: 1;
+      }
+
+      65% {
+        transform: translate(-50%, -50%) scale(1.18) translateY(-22px);
+        opacity: 0.75;
+      }
+
+      85% {
+        transform: translate(-50%, -50%) scale(1.24) translateY(-38px);
+        opacity: 0.35;
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(1.3) translateY(-55px);
+        opacity: 0;
+      }
     }
 
     .mood-fly-emoji.animate-thrilled,
     .mood-fly-emoji.animate-adrenaline {
       animation: fly-fire 1.0s ease forwards;
     }
+
     @keyframes fly-fire {
-      0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      30%  { transform: translate(-50%, -50%) scale(1.25) rotate(-8deg); }
-      60%  { transform: translate(-50%, -50%) scale(1.45) rotate(8deg); opacity: 0.8; }
-      85%  { transform: translate(-50%, -50%) scale(1.75) rotate(-5deg); opacity: 0.35; }
-      100% { transform: translate(-50%, -50%) scale(2) rotate(10deg); opacity: 0; }
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+
+      30% {
+        transform: translate(-50%, -50%) scale(1.25) rotate(-8deg);
+      }
+
+      60% {
+        transform: translate(-50%, -50%) scale(1.45) rotate(8deg);
+        opacity: 0.8;
+      }
+
+      85% {
+        transform: translate(-50%, -50%) scale(1.75) rotate(-5deg);
+        opacity: 0.35;
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(2) rotate(10deg);
+        opacity: 0;
+      }
     }
 
     .mood-fly-emoji.animate-mindblow {
       animation: fly-mind 1.0s ease forwards;
     }
+
     @keyframes fly-mind {
-      0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      35%  { transform: translate(-50%, -50%) scale(1.35) rotate(14deg); }
-      65%  { transform: translate(-50%, -50%) scale(1.6) rotate(-10deg); opacity: 0.75; }
-      85%  { transform: translate(-50%, -50%) scale(2) rotate(18deg); opacity: 0.35; }
-      100% { transform: translate(-50%, -50%) scale(2.4) rotate(24deg); opacity: 0; }
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+
+      35% {
+        transform: translate(-50%, -50%) scale(1.35) rotate(14deg);
+      }
+
+      65% {
+        transform: translate(-50%, -50%) scale(1.6) rotate(-10deg);
+        opacity: 0.75;
+      }
+
+      85% {
+        transform: translate(-50%, -50%) scale(2) rotate(18deg);
+        opacity: 0.35;
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(2.4) rotate(24deg);
+        opacity: 0;
+      }
     }
 
     .mood-fly-emoji.animate-emotional {
       animation: fly-heart 1.0s ease forwards;
     }
+
     @keyframes fly-heart {
-      0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      20%  { transform: translate(-50%, -50%) scale(1.28); }
-      40%  { transform: translate(-50%, -50%) scale(1.06); }
-      60%  { transform: translate(-50%, -50%) scale(1.32); opacity: 0.85; }
-      80%  { transform: translate(-50%, -50%) scale(1.12); opacity: 0.45; }
-      100% { transform: translate(-50%, -50%) scale(1.65); opacity: 0; }
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+
+      20% {
+        transform: translate(-50%, -50%) scale(1.28);
+      }
+
+      40% {
+        transform: translate(-50%, -50%) scale(1.06);
+      }
+
+      60% {
+        transform: translate(-50%, -50%) scale(1.32);
+        opacity: 0.85;
+      }
+
+      80% {
+        transform: translate(-50%, -50%) scale(1.12);
+        opacity: 0.45;
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(1.65);
+        opacity: 0;
+      }
     }
 
     .mood-fly-emoji.animate-inspired {
       animation: fly-sparkle 1.0s ease forwards;
     }
+
     @keyframes fly-sparkle {
-      0%   { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
-      45%  { transform: translate(-50%, -50%) scale(1.3) rotate(22deg); opacity: 0.9; }
-      75%  { transform: translate(-50%, -50%) scale(1.65) rotate(-14deg); opacity: 0.45; }
-      100% { transform: translate(-50%, -50%) scale(2) rotate(-20deg); opacity: 0; }
+      0% {
+        transform: translate(-50%, -50%) scale(1) rotate(0);
+        opacity: 1;
+      }
+
+      45% {
+        transform: translate(-50%, -50%) scale(1.3) rotate(22deg);
+        opacity: 0.9;
+      }
+
+      75% {
+        transform: translate(-50%, -50%) scale(1.65) rotate(-14deg);
+        opacity: 0.45;
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(2) rotate(-20deg);
+        opacity: 0;
+      }
     }
 
     .mood-fly-emoji.animate-nostalgic {
       animation: fly-rewind 1.0s ease forwards;
     }
+
     @keyframes fly-rewind {
-      0%   { transform: translate(-50%, -50%) scale(1) rotateY(0); opacity: 1; }
-      50%  { transform: translate(-50%, -50%) scale(1.2) rotateY(180deg); opacity: 0.85; }
-      80%  { transform: translate(-50%, -50%) scale(1.38) rotateY(320deg); opacity: 0.4; }
-      100% { transform: translate(-50%, -50%) scale(1.5) rotateY(360deg); opacity: 0; }
+      0% {
+        transform: translate(-50%, -50%) scale(1) rotateY(0);
+        opacity: 1;
+      }
+
+      50% {
+        transform: translate(-50%, -50%) scale(1.2) rotateY(180deg);
+        opacity: 0.85;
+      }
+
+      80% {
+        transform: translate(-50%, -50%) scale(1.38) rotateY(320deg);
+        opacity: 0.4;
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(1.5) rotateY(360deg);
+        opacity: 0;
+      }
     }
 
     .mood-fly-emoji.animate-feelgood {
       animation: fly-happy 1.0s ease forwards;
     }
+
     @keyframes fly-happy {
-      0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      25%  { transform: translate(-50%, -50%) scale(1.22) translateY(-10px); }
-      50%  { transform: translate(-50%, -50%) scale(1.08) translateY(0); }
-      75%  { transform: translate(-50%, -50%) scale(1.3) translateY(-16px); opacity: 0.7; }
-      100% { transform: translate(-50%, -50%) scale(1.65) translateY(-30px); opacity: 0; }
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+
+      25% {
+        transform: translate(-50%, -50%) scale(1.22) translateY(-10px);
+      }
+
+      50% {
+        transform: translate(-50%, -50%) scale(1.08) translateY(0);
+      }
+
+      75% {
+        transform: translate(-50%, -50%) scale(1.3) translateY(-16px);
+        opacity: 0.7;
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(1.65) translateY(-30px);
+        opacity: 0;
+      }
     }
   </style>
 </head>
-<body>
-<main>
-  <div class="page-wrapper">
-    <div class="mood-page">
-      <h1 class="mood-title">What's Your <span>Mood</span>?</h1>
-      <p class="mood-subtitle">Pick a feeling — we'll find the perfect film</p>
 
-      <div class="mood-grid">
-        <a th:href="@{/mood/thrilled}" class="mood-card" data-mood="thrilled">
-          <div class="mood-emoji">🔥</div>
-          <div class="mood-name">Thrilled</div>
-          <div class="mood-desc">Action, Suspense, Edge of your seat</div>
-        </a>
-        <a th:href="@{/mood/emotional}" class="mood-card" data-mood="emotional">
-          <div class="mood-emoji">💙</div>
-          <div class="mood-name">Emotional</div>
-          <div class="mood-desc">Drama, Romance, Deep feelings</div>
-        </a>
-        <a th:href="@{/mood/mindblow}" class="mood-card" data-mood="mindblow">
-          <div class="mood-emoji">🤯</div>
-          <div class="mood-name">Mind Blown</div>
-          <div class="mood-desc">Sci-Fi, Mystery, Twists</div>
-        </a>
-        <a th:href="@{/mood/feelgood}" class="mood-card" data-mood="feelgood">
-          <div class="mood-emoji">😄</div>
-          <div class="mood-name">Feel Good</div>
-          <div class="mood-desc">Comedy, Family, Light-hearted</div>
-        </a>
-        <a th:href="@{/mood/scared}" class="mood-card" data-mood="scared">
-          <div class="mood-emoji">👻</div>
-          <div class="mood-name">Scared</div>
-          <div class="mood-desc">Horror, Supernatural, Chilling</div>
-        </a>
-        <a th:href="@{/mood/inspired}" class="mood-card" data-mood="inspired">
-          <div class="mood-emoji">✨</div>
-          <div class="mood-name">Inspired</div>
-          <div class="mood-desc">History, True stories, Uplifting</div>
-        </a>
-        <a th:href="@{/mood/nostalgic}" class="mood-card" data-mood="nostalgic">
-          <div class="mood-emoji">📼</div>
-          <div class="mood-name">Nostalgic</div>
-          <div class="mood-desc">Classics, 90s vibes, Retro</div>
-        </a>
-        <a th:href="@{/mood/adrenaline}" class="mood-card" data-mood="adrenaline">
-          <div class="mood-emoji">🏎️</div>
-          <div class="mood-name">Adrenaline</div>
-          <div class="mood-desc">High-octane, Racing, Intense Action</div>
-        </a>
-        <a th:href="@{/mood/cozy}" class="mood-card" data-mood="cozy">
-          <div class="mood-emoji">☕</div>
-          <div class="mood-name">Cozy</div>
-          <div class="mood-desc">Feel-good, Warm, Comforting</div>
-        </a>
+<body>
+  <main>
+    <div class="page-wrapper">
+      <div class="mood-page">
+        <h1 class="mood-title">What's Your <span>Mood</span>?</h1>
+        <p class="mood-subtitle">Pick a feeling — we'll find the perfect film</p>
+
+        <div class="mood-grid">
+          <a th:href="@{/mood/thrilled}" class="mood-card" data-mood="thrilled">
+            <div class="mood-emoji">🔥</div>
+            <div class="mood-name">Thrilled</div>
+            <div class="mood-desc">Action, Suspense, Edge of your seat</div>
+          </a>
+          <a th:href="@{/mood/emotional}" class="mood-card" data-mood="emotional">
+            <div class="mood-emoji">💙</div>
+            <div class="mood-name">Emotional</div>
+            <div class="mood-desc">Drama, Romance, Deep feelings</div>
+          </a>
+          <a th:href="@{/mood/mindblow}" class="mood-card" data-mood="mindblow">
+            <div class="mood-emoji">🤯</div>
+            <div class="mood-name">Mind Blown</div>
+            <div class="mood-desc">Sci-Fi, Mystery, Twists</div>
+          </a>
+          <a th:href="@{/mood/feelgood}" class="mood-card" data-mood="feelgood">
+            <div class="mood-emoji">😄</div>
+            <div class="mood-name">Feel Good</div>
+            <div class="mood-desc">Comedy, Family, Light-hearted</div>
+          </a>
+          <a th:href="@{/mood/scared}" class="mood-card" data-mood="scared">
+            <div class="mood-emoji">👻</div>
+            <div class="mood-name">Scared</div>
+            <div class="mood-desc">Horror, Supernatural, Chilling</div>
+          </a>
+          <a th:href="@{/mood/inspired}" class="mood-card" data-mood="inspired">
+            <div class="mood-emoji">✨</div>
+            <div class="mood-name">Inspired</div>
+            <div class="mood-desc">History, True stories, Uplifting</div>
+          </a>
+          <a th:href="@{/mood/nostalgic}" class="mood-card" data-mood="nostalgic">
+            <div class="mood-emoji">📼</div>
+            <div class="mood-name">Nostalgic</div>
+            <div class="mood-desc">Classics, 90s vibes, Retro</div>
+          </a>
+          <a th:href="@{/mood/adrenaline}" class="mood-card" data-mood="adrenaline">
+            <div class="mood-emoji">🏎️</div>
+            <div class="mood-name">Adrenaline</div>
+            <div class="mood-desc">High-octane, Racing, Intense Action</div>
+          </a>
+          <a th:href="@{/mood/cozy}" class="mood-card" data-mood="cozy">
+            <div class="mood-emoji">☕</div>
+            <div class="mood-name">Cozy</div>
+            <div class="mood-desc">Feel-good, Warm, Comforting</div>
+          </a>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Overlay background (inside main so Thymeleaf layout renders it) -->
-  <div class="mood-overlay" id="mood-overlay">
-    <div class="mood-overlay-bg"></div>
-  </div>
-</main>
+    <!-- Overlay background (inside main so Thymeleaf layout renders it) -->
+    <div class="mood-overlay" id="mood-overlay">
+      <div class="mood-overlay-bg"></div>
+    </div>
+  </main>
 
-<script data-page>
-(function() {
-  // Clean up on back-button navigation (bfcache restore)
-  window.addEventListener('pageshow', function(e) {
-    var overlay = document.getElementById('mood-overlay');
-    if (overlay) overlay.classList.remove('active');
-    document.querySelectorAll('.mood-fly-emoji').forEach(function(el) { el.remove(); });
-    document.querySelectorAll('.mood-emoji').forEach(function(el) { el.style.opacity = ''; });
-  });
-
-  document.querySelectorAll('.mood-card').forEach(function(card) {
-    card.addEventListener('click', function(e) {
-      e.preventDefault();
-
-      var mood = this.getAttribute('data-mood');
-      var href = this.getAttribute('href');
-      var emojiEl = this.querySelector('.mood-emoji');
-      var rect = emojiEl.getBoundingClientRect();
-
-      // Create a flying clone at the emoji's current position
-      var clone = document.createElement('div');
-      clone.className = 'mood-fly-emoji';
-      clone.textContent = emojiEl.textContent;
-      clone.style.left = (rect.left + rect.width / 2) + 'px';
-      clone.style.top = (rect.top + rect.height / 2) + 'px';
-      clone.style.transform = 'translate(-50%, -50%)';
-      document.body.appendChild(clone);
-
-      // Show dark overlay
-      var overlay = document.getElementById('mood-overlay');
-      overlay.classList.add('active');
-
-      // Hide the original emoji on card
-      emojiEl.style.opacity = '0';
-
-      // Phase 1: Fly to center + grow
-      requestAnimationFrame(function() {
-        requestAnimationFrame(function() {
-          clone.classList.add('flying');
-          clone.style.left = '50vw';
-          clone.style.top = '50vh';
-          clone.style.fontSize = '120px';
-        });
+  <script data-page>
+    (function () {
+      // Clean up on back-button navigation (bfcache restore)
+      window.addEventListener('pageshow', function (e) {
+        var overlay = document.getElementById('mood-overlay');
+        if (overlay) overlay.classList.remove('active');
+        document.querySelectorAll('.mood-fly-emoji').forEach(function (el) { el.remove(); });
+        document.querySelectorAll('.mood-emoji').forEach(function (el) { el.style.opacity = ''; });
       });
 
-      // Phase 2: Arrive at center, play the smooth mood animation (~0.8s)
-      setTimeout(function () {
-        clone.classList.remove('flying');
-        clone.classList.add('animate-' + mood);
-      }, 350);
+      document.querySelectorAll('.mood-card').forEach(function (card) {
+        card.addEventListener('click', function (e) {
+          e.preventDefault();
 
-      // Phase 3: Trigger navigation at 400ms so new page loads right on cue
-      setTimeout(function () {
-        window.location.href = href;
-      }, 400);
-    });
-  });
-}) ();
+          var mood = this.getAttribute('data-mood');
+          var href = this.getAttribute('href');
+          var emojiEl = this.querySelector('.mood-emoji');
+          var rect = emojiEl.getBoundingClientRect();
+
+          // Create a flying clone at the emoji's current position
+          var clone = document.createElement('div');
+          clone.className = 'mood-fly-emoji';
+          clone.textContent = emojiEl.textContent;
+          clone.style.left = (rect.left + rect.width / 2) + 'px';
+          clone.style.top = (rect.top + rect.height / 2) + 'px';
+          clone.style.transform = 'translate(-50%, -50%)';
+          document.body.appendChild(clone);
+
+          // Show dark overlay
+          var overlay = document.getElementById('mood-overlay');
+          overlay.classList.add('active');
+
+          // Hide the original emoji on card
+          emojiEl.style.opacity = '0';
+
+          // Phase 1: Fly to center + grow
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              clone.classList.add('flying');
+              clone.style.left = '50vw';
+              clone.style.top = '50vh';
+              clone.style.fontSize = '120px';
+            });
+          });
+
+          // Phase 2: Arrive at center, play the smooth mood animation (~0.8s)
+          setTimeout(function () {
+            clone.classList.remove('flying');
+            clone.classList.add('animate-' + mood);
+          }, 350);
+
+          // Phase 3: Trigger navigation at 400ms so new page loads right on cue
+          setTimeout(function () {
+            window.location.href = href;
+          }, 400);
+        });
+      });
+    })();
   </script>
 </body>
+
 </html>
