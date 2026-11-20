@@ -151,9 +151,9 @@
       transition: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.15);
     }
 
-    /* Phase 2: Center animations (paced smoothly, ~0.8s) */
+    /* Phase 2: Center animations (1.0s) */
     .mood-fly-emoji.animate-scared {
-      animation: fly-ghost 0.85s ease forwards;
+      animation: fly-ghost 1.0s ease forwards;
     }
     @keyframes fly-ghost {
       0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
@@ -165,7 +165,7 @@
     }
 
     .mood-fly-emoji.animate-cozy {
-      animation: fly-coffee 0.85s ease forwards;
+      animation: fly-coffee 1.0s ease forwards;
     }
     @keyframes fly-coffee {
       0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
@@ -177,7 +177,7 @@
 
     .mood-fly-emoji.animate-thrilled,
     .mood-fly-emoji.animate-adrenaline {
-      animation: fly-fire 0.8s ease forwards;
+      animation: fly-fire 1.0s ease forwards;
     }
     @keyframes fly-fire {
       0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
@@ -188,7 +188,7 @@
     }
 
     .mood-fly-emoji.animate-mindblow {
-      animation: fly-mind 0.8s ease forwards;
+      animation: fly-mind 1.0s ease forwards;
     }
     @keyframes fly-mind {
       0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
@@ -199,7 +199,7 @@
     }
 
     .mood-fly-emoji.animate-emotional {
-      animation: fly-heart 0.85s ease forwards;
+      animation: fly-heart 1.0s ease forwards;
     }
     @keyframes fly-heart {
       0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
@@ -211,7 +211,7 @@
     }
 
     .mood-fly-emoji.animate-inspired {
-      animation: fly-sparkle 0.8s ease forwards;
+      animation: fly-sparkle 1.0s ease forwards;
     }
     @keyframes fly-sparkle {
       0%   { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
@@ -221,7 +221,7 @@
     }
 
     .mood-fly-emoji.animate-nostalgic {
-      animation: fly-rewind 0.8s ease forwards;
+      animation: fly-rewind 1.0s ease forwards;
     }
     @keyframes fly-rewind {
       0%   { transform: translate(-50%, -50%) scale(1) rotateY(0); opacity: 1; }
@@ -231,7 +231,7 @@
     }
 
     .mood-fly-emoji.animate-feelgood {
-      animation: fly-happy 0.8s ease forwards;
+      animation: fly-happy 1.0s ease forwards;
     }
     @keyframes fly-happy {
       0%   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
@@ -351,18 +351,18 @@
       });
 
       // Phase 2: Arrive at center, play the smooth mood animation (~0.8s)
-      setTimeout(function() {
+      setTimeout(function () {
         clone.classList.remove('flying');
         clone.classList.add('animate-' + mood);
       }, 350);
 
       // Phase 3: Trigger navigation at 400ms so new page loads right on cue
-      setTimeout(function() {
+      setTimeout(function () {
         window.location.href = href;
       }, 400);
     });
   });
-})();
-</script>
+}) ();
+  </script>
 </body>
 </html>
