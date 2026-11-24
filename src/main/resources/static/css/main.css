@@ -1190,10 +1190,10 @@ footer .footer-logo span { color: var(--red); }
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transform: scale(0.92);
-  transition: opacity 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
-              transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
-              visibility 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: scale(0.84);
+  transition: opacity 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+              visibility 0.34s cubic-bezier(0.22, 1, 0.36, 1);
   font-family: 'Plus Jakarta Sans', sans-serif;
   will-change: transform, opacity;
 }

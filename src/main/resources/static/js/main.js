@@ -400,8 +400,13 @@ document.addEventListener('DOMContentLoaded', () => {
     hoverCard.style.top = `${top}px`;
     hoverCard.style.width = `${cardWidth}px`;
 
-    hoverCard.classList.add('visible');
-    hoverCard.setAttribute('aria-hidden', 'false');
+    // Force layout flush so scale(0.84) -> scale(1) always animates smoothly from the new position
+    void hoverCard.offsetWidth;
+
+    requestAnimationFrame(() => {
+      hoverCard.classList.add('visible');
+      hoverCard.setAttribute('aria-hidden', 'false');
+    });
   }
 
   function hidePreview() {
