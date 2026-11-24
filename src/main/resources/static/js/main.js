@@ -375,10 +375,10 @@ document.addEventListener('DOMContentLoaded', () => {
     playBtn.setAttribute('href', href);
     infoBtn.setAttribute('href', href);
 
-    // Calculate dimensions & position over the hovered card (generous Prime Video scale)
+    // Calculate dimensions & position over the hovered card (Prime Video scale)
     const rect = targetCard.getBoundingClientRect();
-    const cardWidth = Math.min(Math.max(Math.round(rect.width * 1.55), 320), 360);
-    const cardHeight = Math.round(cardWidth * 1.15);
+    const cardWidth = Math.min(Math.max(Math.round(rect.width * 1.95), 380), 420);
+    const cardHeight = Math.round(cardWidth * 1.12);
 
     let left = rect.left - (cardWidth - rect.width) / 2;
     let top = rect.top - (cardHeight - rect.height) / 2;
@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
       clearTimeout(openTimer);
       openTimer = setTimeout(() => {
         showPreview(card);
-      }, 300); // 300ms hover debounce
+      }, 200); // 200ms hover debounce
     } else if (e.target.closest('#prime-hover-card')) {
       clearTimeout(closeTimer);
     }
@@ -436,11 +436,11 @@ document.addEventListener('DOMContentLoaded', () => {
       clearTimeout(openTimer);
       closeTimer = setTimeout(() => {
         hidePreview();
-      }, 200);
+      }, 150);
     } else if (e.target.closest('#prime-hover-card')) {
       closeTimer = setTimeout(() => {
         hidePreview();
-      }, 200);
+      }, 150);
     }
   });
 
@@ -450,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
   hoverCard.addEventListener('mouseleave', () => {
     closeTimer = setTimeout(() => {
       hidePreview();
-    }, 200);
+    }, 150);
   });
 
   // Clicking anywhere on the hover card navigates directly to the movie/show page
