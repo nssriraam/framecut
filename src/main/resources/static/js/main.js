@@ -375,25 +375,25 @@ document.addEventListener('DOMContentLoaded', () => {
     playBtn.setAttribute('href', href);
     infoBtn.setAttribute('href', href);
 
-    // Calculate dimensions & position over the hovered card
+    // Calculate dimensions & position over the hovered card (generous Prime Video scale)
     const rect = targetCard.getBoundingClientRect();
-    const cardWidth = Math.min(Math.max(Math.round(rect.width * 1.34), 245), 285);
-    const cardHeight = 315;
+    const cardWidth = Math.min(Math.max(Math.round(rect.width * 1.55), 320), 360);
+    const cardHeight = Math.round(cardWidth * 1.15);
 
     let left = rect.left - (cardWidth - rect.width) / 2;
-    let top = rect.top - 8;
+    let top = rect.top - (cardHeight - rect.height) / 2;
 
-    // Viewport collision bounds
-    if (left < 14) {
-      left = 14;
-    } else if (left + cardWidth > window.innerWidth - 14) {
-      left = window.innerWidth - cardWidth - 14;
+    // Viewport collision bounds with safe padding
+    if (left < 16) {
+      left = 16;
+    } else if (left + cardWidth > window.innerWidth - 16) {
+      left = window.innerWidth - cardWidth - 16;
     }
 
     if (top < 72) {
       top = 72;
-    } else if (top + cardHeight > window.innerHeight - 14) {
-      top = Math.max(72, window.innerHeight - cardHeight - 14);
+    } else if (top + cardHeight > window.innerHeight - 16) {
+      top = Math.max(72, window.innerHeight - cardHeight - 16);
     }
 
     hoverCard.style.left = `${left}px`;
