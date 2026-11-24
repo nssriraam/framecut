@@ -83,11 +83,10 @@
 .auth-logo a span { color: var(--red); }
 
 .auth-title {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 22px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 20px;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: -0.01em;
   color: var(--cream);
   text-align: center;
   margin-bottom: 0.5rem;
@@ -106,10 +105,10 @@
 
 .form-label {
   display: block;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-secondary);
   margin-bottom: 0.4rem;
@@ -121,8 +120,8 @@
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 6px;
   color: var(--text-primary);
-  font-family: 'Barlow', sans-serif;
-  font-size: 15px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
   padding: 0.75rem 1rem;
   outline: none;
   transition: var(--transition);
@@ -153,10 +152,10 @@
   color: white;
   border: none;
   padding: 0.85rem;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 16px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   border-radius: 6px;
   cursor: pointer;

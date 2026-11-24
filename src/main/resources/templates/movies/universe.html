@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title th:text="${directorName + ' Universe | FrameCut'}">Director Universe</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/main.css}">
   <style>
     :root {
@@ -15,7 +15,7 @@
       margin: 0; padding: 0;
       background: var(--bg);
       color: var(--text);
-      font-family: 'Barlow', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       overflow: hidden; /* We'll use custom scrolling */
     }
     
@@ -240,10 +240,10 @@
   <div class="universe-canvas" id="canvas">
     <div style="position:fixed;top:30px;right:40px;z-index:9999;display:flex;gap:10px;">
       <div style="position:relative">
-        <input type="text" id="director-search" placeholder="Search another director..." autocomplete="off" style="background:rgba(20,20,20,0.8);border:1px solid rgba(255,255,255,0.2);color:white;padding:10px 15px;border-radius:20px;outline:none;font-family:'Barlow',sans-serif;width:250px;backdrop-filter:blur(10px);" onkeydown="if(event.key==='Enter') searchDirector()">
+        <input type="text" id="director-search" placeholder="Search another director..." autocomplete="off" style="background:rgba(20,20,20,0.8);border:1px solid rgba(255,255,255,0.2);color:white;padding:10px 15px;border-radius:20px;outline:none;font-family:'Plus Jakarta Sans',sans-serif;width:250px;backdrop-filter:blur(10px);" onkeydown="if(event.key==='Enter') searchDirector()">
         <div class="autocomplete-results" id="dir-autocomplete-results" style="left:0;right:0;width:100%;top:100%;margin-top:5px;border-radius:12px;overflow:hidden;text-align:left;position:absolute;z-index:9999"></div>
       </div>
-      <button onclick="searchDirector()" style="background:var(--red);color:white;border:none;border-radius:20px;padding:10px 20px;cursor:pointer;font-weight:700;font-family:'Barlow',sans-serif;">Search</button>
+      <button onclick="searchDirector()" style="background:var(--red);color:white;border:none;border-radius:20px;padding:10px 20px;cursor:pointer;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">Search</button>
     </div>
     
     <svg id="svg-layer"></svg>
@@ -507,7 +507,7 @@
             <div style="flex:0 0 200px">
               <img src="${imgUrl}" style="width:100%;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.5)">
             </div>
-            <div style="flex:1;min-width:300px;font-family:'Barlow',sans-serif">
+            <div style="flex:1;min-width:300px;font-family:'Plus Jakarta Sans',sans-serif">
               <h2 style="font-family:'Bebas Neue',sans-serif;font-size:42px;margin:0 0 0.5rem 0;color:white;letter-spacing:0.05em">${data.name}</h2>
               <div style="color:rgba(240,236,224,0.6);font-size:14px;margin-bottom:1.5rem">${data.place_of_birth || ''} ${data.birthday ? '· ' + data.birthday : ''}</div>
               <p style="color:rgba(240,236,224,0.85);font-size:14px;line-height:1.6;margin-bottom:2rem">${bio}</p>

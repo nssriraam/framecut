@@ -21,7 +21,7 @@
 
   <div class="detail-page page-wrapper">
     <!-- Top-Left Sleek Back Arrow -->
-    <a href="javascript:history.back()" style="position:absolute;top:6.5rem;left:2rem;color:white;text-decoration:none;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.15em;display:flex;align-items:center;gap:0.5rem;z-index:50;text-transform:uppercase;transition:color 0.3s;font-size:14px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='white'">
+    <a href="javascript:history.back()" style="position:absolute;top:6.5rem;left:2rem;color:white;text-decoration:none;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;letter-spacing:0.05em;display:flex;align-items:center;gap:0.5rem;z-index:50;transition:color 0.3s;font-size:13px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='white'">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       Back
     </a>
@@ -167,7 +167,7 @@
                   th:text="'(' + reviewCount + ')'"></span>
           </h2>
           <!-- Spoiler Toggle -->
-          <label style="display:flex;align-items:center;gap:0.75rem;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:rgba(240,236,224,0.5)">
+          <label style="display:flex;align-items:center;gap:0.75rem;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:rgba(240,236,224,0.5)">
             <span>🔒 Unlock Spoilers</span>
             <div style="position:relative;width:44px;height:24px">
               <input type="checkbox" id="spoiler-toggle" onchange="toggleSpoilers()" style="opacity:0;width:0;height:0;position:absolute">
@@ -194,23 +194,23 @@
             <!-- Score out of 10 + one word summary -->
             <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap">
               <div style="flex:1;min-width:120px">
-                <label style="display:block;font-family:'Barlow Condensed',sans-serif;font-size:11px;
-                              font-weight:700;letter-spacing:0.15em;text-transform:uppercase;
+                <label style="display:block;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;
+                              font-weight:600;letter-spacing:0.05em;text-transform:uppercase;
                               color:rgba(240,236,224,0.5);margin-bottom:0.4rem">Score /10 (optional)</label>
                 <input type="number" name="score" min="0" max="10" step="0.5"
                        placeholder="e.g. 8.5"
                        style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
-                              border-radius:6px;color:#f0ece0;font-family:'Barlow',sans-serif;font-size:14px;
+                              border-radius:6px;color:#f0ece0;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;
                               padding:0.6rem 0.75rem;outline:none">
               </div>
               <div style="flex:2;min-width:160px">
-                <label style="display:block;font-family:'Barlow Condensed',sans-serif;font-size:11px;
-                              font-weight:700;letter-spacing:0.15em;text-transform:uppercase;
+                <label style="display:block;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;
+                              font-weight:600;letter-spacing:0.05em;text-transform:uppercase;
                               color:rgba(240,236,224,0.5);margin-bottom:0.4rem">One Word Summary (optional)</label>
                 <input type="text" name="summary" maxlength="50"
                        placeholder="e.g. Haunting, Brilliant, Intense..."
                        style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
-                              border-radius:6px;color:#f0ece0;font-family:'Barlow',sans-serif;font-size:14px;
+                              border-radius:6px;color:#f0ece0;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;
                               padding:0.6rem 0.75rem;outline:none">
               </div>
             </div>
@@ -261,7 +261,7 @@
             <!-- Spoiler Warning Overlay -->
             <div th:if="${review.hasSpoilers != null and review.hasSpoilers}" class="spoiler-overlay">
               <span style="font-size:24px">🔒</span>
-              <span style="font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;font-size:13px">Spoiler — Toggle to reveal</span>
+              <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:12px">Spoiler — Toggle to reveal</span>
             </div>
             <div class="review-card-header">
               <div class="reviewer-info">

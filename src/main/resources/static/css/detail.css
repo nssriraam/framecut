@@ -91,22 +91,23 @@
   display: inline-block;
   background: var(--red);
   color: white;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   padding: 0.25rem 0.7rem;
-  border-radius: 2px;
+  border-radius: 3px;
   margin-bottom: 1rem;
 }
 
 /* Big movie title */
 .detail-title {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(48px, 7vw, 90px);
-  line-height: 0.93;
-  letter-spacing: 0.02em;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(34px, 5.5vw, 68px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
   color: #f0ece0;
   margin-bottom: 0.6rem;
   text-shadow: 2px 4px 30px rgba(0,0,0,0.6);
@@ -128,8 +129,9 @@
 }
 
 .detail-tmdb-rating .score {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 32px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
   color: #f5c842;
   line-height: 1;
 }
@@ -207,10 +209,10 @@
 }
 
 .meta-label {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.25em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--red);
   margin-bottom: 0.35rem;
@@ -240,9 +242,10 @@
 .reviews-section { margin-top: 1rem; }
 
 .reviews-section h2 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 34px;
-  letter-spacing: 0.05em;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: #f0ece0;
   margin-bottom: 1.5rem;
   display: flex;
@@ -269,10 +272,10 @@
 }
 
 .review-form h3 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 18px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.01em;
   margin-bottom: 1rem;
   color: #f0ece0;
 }
@@ -298,7 +301,7 @@
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 6px;
   color: #f0ece0;
-  font-family: 'Barlow', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 14px;
   padding: 0.75rem 1rem;
   resize: vertical;
@@ -345,8 +348,9 @@
   border-radius: 50%;
   background: var(--red);
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 16px; color: white; flex-shrink: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 15px; color: white; flex-shrink: 0;
 }
 
 .reviewer-name { font-weight: 600; font-size: 14px; color: #f0ece0; }
@@ -371,9 +375,9 @@
   align-items: center;
   gap: 6px;
   color: rgba(240,236,224,0.4);
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 11px;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   animation: scrollBounce 2s ease infinite;
   z-index: 2;

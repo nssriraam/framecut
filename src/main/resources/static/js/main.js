@@ -306,6 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!hoverCard) return;
 
   const cardImg = document.getElementById('hover-card-img');
+  const cardBgBlur = document.getElementById('hover-card-bg-blur');
   const cardBadge = document.getElementById('hover-card-badge');
   const cardTitle = document.getElementById('hover-card-title');
   const playBtn = document.getElementById('hover-card-play-btn');
@@ -323,7 +324,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!targetCard) return;
     if (window.innerWidth <= 768) return;
 
+    if (activeCard && activeCard !== targetCard) {
+      activeCard.classList.remove('hover-hidden');
+    }
     activeCard = targetCard;
+    targetCard.classList.add('hover-hidden');
 
     const href = targetCard.getAttribute('href') || '#';
     const poster = targetCard.getAttribute('data-backdrop') ||
@@ -343,6 +348,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Populate data
     cardImg.src = poster;
+    if (cardBgBlur && poster) {
+      cardBgBlur.style.backgroundImage = `url("${poster}")`;
+    }
     cardTitle.textContent = title;
     cardBadge.textContent = (type && type.toLowerCase().includes('tv')) ? 'SERIES' : 'MOVIE';
 
@@ -359,24 +367,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Calculate dimensions & position over the hovered card
     const rect = targetCard.getBoundingClientRect();
-    const cardWidth = 320;
-    const cardHeight = 350;
+    const cardWidth = Math.min(Math.max(Math.round(rect.width * 1.34), 245), 285);
+    const cardHeight = 315;
 
-    let left = rect.left + (rect.width / 2) - (cardWidth / 2);
-    let top = rect.top + (rect.height / 2) - (cardHeight / 2);
+    let left = rect.left - (cardWidth - rect.width) / 2;
+    let top = rect.top - 8;
 
     // Viewport collision bounds
-    if (left < 16) {
-      left = 16;
-    } else if (left + cardWidth > window.innerWidth - 16) {
-      left = window.innerWidth - cardWidth - 16;
+    if (left < 14) {
+      left = 14;
+    } else if (left + cardWidth > window.innerWidth - 14) {
+      left = window.innerWidth - cardWidth - 14;
     }
 
-    if (top < 75) {
-      top = rect.top;
-      if (top < 75) top = 75;
-    } else if (top + cardHeight > window.innerHeight - 16) {
-      top = window.innerHeight - cardHeight - 16;
+    if (top < 72) {
+      top = 72;
+    } else if (top + cardHeight > window.innerHeight - 14) {
+      top = Math.max(72, window.innerHeight - cardHeight - 14);
     }
 
     hoverCard.style.left = `${left}px`;
@@ -390,7 +397,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function hidePreview() {
     hoverCard.classList.remove('visible');
     hoverCard.setAttribute('aria-hidden', 'true');
-    activeCard = null;
+    if (activeCard) {
+      activeCard.classList.remove('hover-hidden');
+      activeCard = null;
+    }
   }
 
   // Event Delegation for hover over .movie-card
