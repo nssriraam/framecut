@@ -230,9 +230,39 @@
            class="genre-tile"
            th:attr="data-genre=${#strings.toLowerCase(genre)}">
           <div class="genre-tile-bg"></div>
+          <div class="genre-tile-overlay"></div>
           <div class="genre-tile-content">
+            <span class="genre-tile-icon" th:switch="${#strings.toLowerCase(genre)}">
+              <span th:case="'action'">⚡</span>
+              <span th:case="'action & adventure'">🏹</span>
+              <span th:case="'adventure'">🧭</span>
+              <span th:case="'animation'">🎨</span>
+              <span th:case="'comedy'">🎭</span>
+              <span th:case="'crime'">🕶️</span>
+              <span th:case="'documentary'">📽️</span>
+              <span th:case="'drama'">👑</span>
+              <span th:case="'family'">🎈</span>
+              <span th:case="'fantasy'">🔮</span>
+              <span th:case="'history'">🏛️</span>
+              <span th:case="'horror'">💀</span>
+              <span th:case="'kids'">🎠</span>
+              <span th:case="'music'">🎵</span>
+              <span th:case="'mystery'">🔍</span>
+              <span th:case="'news'">📰</span>
+              <span th:case="'reality'">📺</span>
+              <span th:case="'romance'">💖</span>
+              <span th:case="'science fiction'">🚀</span>
+              <span th:case="'sci-fi & fantasy'">🛸</span>
+              <span th:case="'soap'">🕯️</span>
+              <span th:case="'tv movie'">🎞️</span>
+              <span th:case="'talk'">🎙️</span>
+              <span th:case="'thriller'">🔥</span>
+              <span th:case="'war'">⚔️</span>
+              <span th:case="'war & politics'">🛡️</span>
+              <span th:case="'western'">🤠</span>
+              <span th:case="*">🎬</span>
+            </span>
             <span class="genre-tile-name" th:text="${genre}">Genre</span>
-            <span class="genre-tile-arrow" aria-hidden="true">→</span>
           </div>
         </a>
       </div>
