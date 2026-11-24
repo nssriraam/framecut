@@ -1,75 +1,74 @@
-<h1 align="center">🎬 FrameCut</h1>
+<h1 align="center">🎬 FrameCut: Your Cinema, Your Story</h1>
+
 <p align="center">
-  <strong>Your Cinema, Your Story</strong><br>
-  <em>A modern, high-performance streaming discovery & cinema diary platform.</em>
+  <img src="docs/screenshot.png" alt="FrameCut Banner" width="100%">
 </p>
 
 <p align="center">
-  <a href="https://framecut-kmem.onrender.com/"><img src="https://img.shields.io/badge/Live%20Demo-Render-red?style=for-the-badge&logo=render" alt="Live Demo"></a>
+  <a href="https://framecut-kmem.onrender.com/"><img src="https://img.shields.io/badge/Live%20Application-framecut--kmem.onrender.com-red?style=for-the-badge&logo=render" alt="Live Platform"></a>
+  <img src="https://img.shields.io/badge/Status-Active%20Production-brightgreen?style=for-the-badge" alt="Production">
   <img src="https://img.shields.io/badge/Java-17-blue?style=for-the-badge&logo=openjdk" alt="Java 17">
   <img src="https://img.shields.io/badge/Spring%20Boot-3.2-brightgreen?style=for-the-badge&logo=springboot" alt="Spring Boot 3.2">
   <img src="https://img.shields.io/badge/PostgreSQL-15-336791?style=for-the-badge&logo=postgresql" alt="PostgreSQL">
-  <img src="https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge" alt="License">
 </p>
 
 <p align="center">
-  🌐 <strong>Live Application:</strong> <a href="https://framecut-kmem.onrender.com/">https://framecut-kmem.onrender.com/</a>
+  🌐 <strong>Official Website:</strong> <a href="https://framecut-kmem.onrender.com/">https://framecut-kmem.onrender.com/</a>
 </p>
 
 ---
 
-## 🌟 Overview
+## 🌟 About FrameCut
 
-**FrameCut** is a production-grade cinema discovery platform and movie tracking diary built for cinephiles. Inspired by streaming interfaces like **Amazon Prime Video** and social film platforms like **Letterboxd**, FrameCut combines rich media exploration with robust catalog architecture.
+**FrameCut** is a bespoke, full-stack cinema discovery platform and movie tracking diary designed for true film lovers. Inspired by streaming interfaces like **Amazon Prime Video** and social film platforms like **Letterboxd**, FrameCut combines rich visual media exploration with automated catalog synchronization and personal film journaling.
 
-Whether you are logging your film journal, navigating the filmographies of legendary directors, exploring fresh theatrical releases, or discovering a movie tailored to your mood, FrameCut delivers a fluid, dark-mode streaming experience.
+Operating as a live, fully responsive production web application, FrameCut features a sleek dark-mode glassmorphic interface, fluid micro-animations, and continuous data pipelines that keep thousands of titles, ratings, and cast networks up to date.
 
 ---
 
-## 🍿 Core Features
+## 🍿 Platform Experience & Features
 
 ### 🎬 Prime Video-Style Hover Preview Cards
-- **Cinematic Popups:** Hovering over any movie or series tile smoothly expands into a high-resolution preview with ambient backdrop blur, key art, rating, genre tags, and synopsis.
-- **One-Click Navigation:** Directly click anywhere on the expanded preview card to navigate seamlessly into the title's detail page.
-- **Hardware-Accelerated Animation:** Uses decelerated cubic-bezier curves with GPU rasterization to eliminate stutter or sudden layout shifts.
+- **Seamless Interactive Portal:** Hovering over any movie or series tile smoothly expands into a prominent preview card complete with ambient backdrop blur, high-resolution key art, rating, genre badges, and overview synopsis.
+- **Full-Card Clickability:** Clicking anywhere on the expanded card immediately launches the full title detail view for frictionless navigation.
+- **Hardware-Accelerated Easing:** Powered by GPU-accelerated cubic-bezier curves (`cubic-bezier(0.2, 0.8, 0.2, 1)`) and soft fade transitions, eliminating stutter and abrupt layout shifts.
 
-### 🎨 Vibrant "Explore by Genre" Categories
-- **Dynamic Category Themes:** Replaced dull static boxes with vibrant, individualized color gradients (Action crimson, Sci-Fi cyan, Animation magenta, Horror blood-red, etc.).
-- **Interactive Glyphs & Glow:** Micro-animations and ambient lighting sweep across genre tiles on hover.
+### 🎨 Radiant "Explore by Genre" Categories
+- **Bespoke Visual Palettes:** Replaced generic tiles with dynamic, individualized radiant color themes for over 20 genres (Action crimson, Sci-Fi cyan, Animation magenta, Horror blood-red, Comedy amber, etc.).
+- **Interactive Glyphs & Glow:** Ambient lighting and subtle micro-elevations sweep across cards on hover.
 
-### ⚡ Sub-15ms Live Autocomplete
-- **Local-First Caching:** Keystroke autocomplete checks the local database first, returning instant suggestions in **5–15ms**.
-- **Parallel TMDB Fallback:** If a newly released title (such as upcoming or regional 2026 films) isn't cached yet, parallel WebClient requests query TMDB in the background and insert it on the fly.
-- **Stale Request Cancellation:** Employs frontend `AbortController` and 200ms debounce to prevent input lag.
+### ⚡ Sub-15ms Live Search
+- **Instant Local Autocomplete:** Search queries check the indexed database first, returning matching titles and poster thumbnails in **5–15ms**.
+- **Parallel Real-Time Discovery:** For newly released or regional films not yet in the local database, parallel non-blocking WebClient requests query TMDB in real time and store them on the fly.
+- **Stale Request Cancellation:** Uses frontend `AbortController` and debounced event dispatching to ensure smooth, zero-latency typing.
 
 ### 📖 Personal Cinema Diary & Watchlists
-- Rate titles on a 5-star or 10-point scale.
-- Write reviews with optional **Spoiler Warning Masks** that other users can click to reveal.
-- Curate a personal watchlist directly tied to your authenticated profile.
+- Rate films and television series on 5-star and 10-point scales.
+- Write community reviews with built-in **Spoiler Warning Masks** that viewers can toggle to reveal.
+- Curate and track a personalized cinema watchlist linked to user accounts.
 
 ### 🌌 The Cinematic Director Universe
-- Dedicated director hubs (Christopher Nolan, Quentin Tarantino, Hayao Miyazaki, Karthik Subbaraj, and more).
-- Visualizes recurring actor collaborations, film chronologies, and signature directorial motifs.
+- Dedicated hub to explore the filmographies of legendary directors (Christopher Nolan, Quentin Tarantino, Hayao Miyazaki, Karthik Subbaraj, and more).
+- Visualizes recurring actor collaborations, career timelines, and directorial styles in an interactive network canvas.
 
-### 🎭 Mood Matcher & Curated Shelves
-- Recommends titles based on your current emotional vibe (*Thrilled*, *Emotional*, *Mind-Blown*, *Feel-Good*, *Nostalgic*).
-- Highlights **Hidden Gems**, **New Releases**, and **Top Rated** classics with deterministic sorting to prevent duplicate records during infinite scroll.
+### 🎭 Mood Matcher
+- Personalized recommendation engine matching curated cinema selections to the viewer's current emotional vibe (*Thrilled*, *Emotional*, *Mind-Blown*, *Feel-Good*, *Nostalgic*).
 
-### 🛡️ Production-Grade Security
+### 🛡️ Production Security Architecture
 - Dual credential authentication: sign in via either **Username or Email**.
-- BCrypt password encryption with adaptive work factor.
-- Secure HTTP session management with `HttpOnly`, `SameSite=Lax`, and HTTPS protection.
-- Configurable environment-driven administrator bootstrapping.
+- BCrypt password hashing with adaptive salt work factors.
+- Secure session management with `HttpOnly`, `SameSite=Lax`, and SSL/TLS protection.
+- Hardened against unauthorized privilege escalation and brute-force attacks.
 
 ---
 
-## ⚙️ Architecture & Data Pipeline
+## ⚙️ Automated Backend Architecture & Data Pipeline
 
 ```
  [User Browser] 
        │
        ▼
- [Spring Security Filter Chain] (BCrypt, Session Cookies, CSRF protection)
+ [Spring Security Filter Chain] (BCrypt, Session Cookies, HTTPS)
        │
        ▼
  [Controllers] ──► [Service Layer] ──► [PostgreSQL Database] (Local Cache)
@@ -78,58 +77,25 @@ Whether you are logging your film journal, navigating the filmographies of legen
                    [TMDB REST API]
 ```
 
-- **Automated 6-Hour Background Sync:** A persistent `TmdbSyncScheduler` regularly pulls weekly trending titles (`/trending/movie/week`, `/trending/tv/week`) and theatrical/OTT releases (`/movie/now_playing`, `/tv/on_the_air`).
-- **Persistent State Pagination:** Catalog pagination is tracked in the database (`sync_state` table) across application reboots and safely cycles when reaching catalog limits.
+- **Continuous 6-Hour Automated Synchronization:** A persistent background scheduler (`TmdbSyncScheduler`) runs every 6 hours, pulling the latest weekly trending cinema (`/trending/movie/week`, `/trending/tv/week`) and current theatrical/OTT releases (`/movie/now_playing`, `/tv/on_the_air`).
+- **Persistent Database Sync State:** Catalog pagination progress is tracked directly in the PostgreSQL `sync_state` table, ensuring the ingest pipeline continuously advances and safely recycles without losing state across deployments.
+- **Deterministic Infinite Scrolling:** Multi-layered SQL sorting ensures zero duplicate records during continuous infinite scrolling.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Technology Stack
 
 | Layer | Technology |
 |---|---|
-| **Backend** | Java 17, Spring Boot 3.2 (Web, Security, Data JPA, Scheduling, Validation) |
+| **Backend Framework** | Java 17, Spring Boot 3.2 (Web, Security, Data JPA, Scheduling, Validation) |
 | **HTTP Client** | Spring WebFlux `WebClient` (non-blocking reactive TMDB consumer) |
-| **Database** | PostgreSQL 15 / Render Managed PostgreSQL, Hibernate / JPA |
-| **Frontend** | Thymeleaf 3, HTML5, CSS3 (`Plus Jakarta Sans` & `Bebas Neue`), Vanilla ES6+ JS |
-| **Container & Cloud** | Docker, Docker Compose, Render PaaS |
+| **Database** | PostgreSQL 15, Hibernate ORM / JPA |
+| **Frontend** | Thymeleaf 3, HTML5, CSS3 (`Plus Jakarta Sans` & `Bebas Neue`), Vanilla ES6+ JavaScript |
+| **Infrastructure** | Render Cloud Platform, Docker, 24/7 Availability Monitoring |
 
 ---
 
-## 🚀 Running Locally
-
-### 1. Prerequisites
-- **JDK 17** or later
-- **Docker & Docker Compose** (or a local PostgreSQL instance)
-- A free **TMDB API Key** from [themoviedb.org](https://www.themoviedb.org/documentation/api)
-
-### 2. Configure Environment
-Copy the example environment file:
-```bash
-cp .env.example .env
-```
-Update `.env` with your TMDB API Key and database credentials:
-```properties
-TMDB_API_KEY=your_tmdb_api_key_here
-SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/framecut
-SPRING_DATASOURCE_USERNAME=postgres
-SPRING_DATASOURCE_PASSWORD=postgres
-ADMIN_PASSWORD=your_secure_admin_password
-```
-
-### 3. Start with Docker Compose
-```bash
-docker compose up --build -d
-```
-Access the application at `http://localhost:8080`.
-
-### 4. Or Run with Maven Directly
-```bash
-./mvnw clean spring-boot:run
-```
-
----
-
-## 📄 License
-Distributed under the MIT License. See `LICENSE` for details.
-
-*Copyright © 2026 FrameCut. Built for cinema lovers.*
+<p align="center">
+  <em>Copyright © 2026 FrameCut. All rights reserved.</em><br>
+  <strong>Bespoke production web application built for cinema lovers.</strong>
+</p>
