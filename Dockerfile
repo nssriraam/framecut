@@ -17,6 +17,7 @@ EXPOSE 8080
 
 ENTRYPOINT ["java", \
   "-Djava.security.egd=file:/dev/./urandom", \
-  "-Xms256m", \
-  "-Xmx512m", \
+  "-Xms128m", \
+  "-Xmx300m", \
+  "-XX:MaxMetaspaceSize=110m", \
   "-jar", "app.jar"]

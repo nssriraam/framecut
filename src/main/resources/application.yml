@@ -37,7 +37,7 @@ tmdb:
   base-url: https://api.themoviedb.org/3
   image-base-url: https://image.tmdb.org/t/p
   fetch-on-startup: ${TMDB_FETCH_ON_STARTUP:true}
-  pages-per-run: ${TMDB_PAGES_PER_RUN:50}
+  pages-per-run: ${TMDB_PAGES_PER_RUN:10}
 
 logging:
   level:

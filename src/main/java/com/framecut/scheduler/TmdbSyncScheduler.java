@@ -69,8 +69,8 @@ public class TmdbSyncScheduler {
         }
     }
 
-    // Runs every 6 hours (and 5 minutes after launch)
-    @Scheduled(fixedDelay = 21600000, initialDelay = 300000)
+    // Runs every 6 hours (initial trending sync already runs on startup)
+    @Scheduled(fixedDelay = 21600000, initialDelay = 21600000)
     public void scheduledSync() {
         log.info("Running automatic scheduled TMDB sync...");
         try {
