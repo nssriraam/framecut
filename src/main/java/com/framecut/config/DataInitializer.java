@@ -6,6 +6,7 @@ import com.framecut.repository.UserRepository;
 import com.framecut.repository.WatchlistRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -24,51 +25,69 @@ public class DataInitializer implements CommandLineRunner {
     private final ReviewRepository reviewRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${ADMIN_USERNAME:golddaizen}")
+    private String adminUsername;
+
+    @Value("${ADMIN_EMAIL:nosriraam7@gmail.com}")
+    private String adminEmail;
+
+    @Value("${ADMIN_PASSWORD:}")
+    private String adminPassword;
+
     @Override
     @Transactional
     public void run(String... args) {
-        log.info("Running DataInitializer for admin account setup...");
+        log.info("Running DataInitializer security audit & account setup...");
 
-        final String targetEmail = "nosriraam7@gmail.com";
-        final String targetUsername = "golddaizen";
-        final String targetPassword = "tatake0";
+        // 1. Verify or initialize admin account
+        Optional<User> byEmail = (adminEmail != null && !adminEmail.isBlank())
+            ? userRepository.findByEmail(adminEmail)
+            : Optional.empty();
+        Optional<User> byUsername = (adminUsername != null && !adminUsername.isBlank())
+            ? userRepository.findByUsername(adminUsername)
+            : Optional.empty();
 
-        // 1. Look for existing user by email or username
-        Optional<User> byEmail = userRepository.findByEmail(targetEmail);
-        Optional<User> byUsername = userRepository.findByUsername(targetUsername);
-
-        User adminUser;
+        User adminUser = null;
         if (byEmail.isPresent()) {
             adminUser = byEmail.get();
-            adminUser.setUsername(targetUsername);
-            adminUser.setEmail(targetEmail);
-            adminUser.setPassword(passwordEncoder.encode(targetPassword));
-            adminUser.setRole(User.Role.ADMIN);
-            userRepository.save(adminUser);
-            log.info("Updated existing user by email '{}' to username '{}' with ADMIN role and new password", targetEmail, targetUsername);
         } else if (byUsername.isPresent()) {
             adminUser = byUsername.get();
-            adminUser.setEmail(targetEmail);
-            adminUser.setPassword(passwordEncoder.encode(targetPassword));
+        }
+
+        if (adminUser != null) {
+            adminUser.setUsername(adminUsername);
+            if (adminEmail != null && !adminEmail.isBlank()) {
+                adminUser.setEmail(adminEmail);
+            }
             adminUser.setRole(User.Role.ADMIN);
+            // Update password only if an explicit password is provided in environment variables
+            if (adminPassword != null && !adminPassword.isBlank()) {
+                adminUser.setPassword(passwordEncoder.encode(adminPassword));
+                log.info("Admin password updated from environment variable.");
+            }
             userRepository.save(adminUser);
-            log.info("Updated existing user by username '{}' with email '{}' and ADMIN role", targetUsername, targetEmail);
+            log.info("Verified admin account '{}' with ADMIN role.", adminUsername);
         } else {
+            // New deployment fallback: create initial admin account
+            String initialPassword = (adminPassword != null && !adminPassword.isBlank())
+                ? adminPassword
+                : "FrameCutAdmin2026!";
             adminUser = User.builder()
-                .username(targetUsername)
-                .email(targetEmail)
-                .password(passwordEncoder.encode(targetPassword))
+                .username(adminUsername)
+                .email(adminEmail != null && !adminEmail.isBlank() ? adminEmail : "admin@framecut.com")
+                .password(passwordEncoder.encode(initialPassword))
                 .role(User.Role.ADMIN)
                 .build();
             userRepository.save(adminUser);
-            log.info("Created new admin user '{}' with email '{}' and ADMIN role", targetUsername, targetEmail);
+            log.info("Initialized admin account '{}' with ADMIN role.", adminUsername);
         }
 
-        // 2. Clean up any other test users (keep only the admin account)
+        // 2. Clean up any other test users (ensure only the admin account exists)
+        final Long adminId = adminUser.getId();
         List<User> allUsers = userRepository.findAll();
         for (User u : allUsers) {
-            if (!u.getId().equals(adminUser.getId())) {
-                log.info("Purging other user account: id={}, username={}, email={}", u.getId(), u.getUsername(), u.getEmail());
+            if (!u.getId().equals(adminId)) {
+                log.info("Security cleanup: removing unverified user id={}", u.getId());
                 try {
                     watchlistRepository.findAll().stream()
                         .filter(w -> w.getUser() != null && w.getUser().getId().equals(u.getId()))
@@ -78,12 +97,12 @@ public class DataInitializer implements CommandLineRunner {
                         .forEach(reviewRepository::delete);
                     userRepository.delete(u);
                 } catch (Exception ex) {
-                    log.error("Failed to delete old test user {}: {}", u.getUsername(), ex.getMessage());
+                    log.error("Failed to delete user {}: {}", u.getId(), ex.getMessage());
                 }
             }
         }
 
-        log.info("DataInitializer completed. Active Admin: username='{}', email='{}', total users in DB: {}",
-            adminUser.getUsername(), adminUser.getEmail(), userRepository.count());
+        log.info("Security initialization complete. Active admin: '{}'. Total users in DB: {}",
+            adminUser.getUsername(), userRepository.count());
     }
 }

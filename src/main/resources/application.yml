@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/framecut
-    username: framecut
-    password: framecut123
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/framecut}
+    username: ${SPRING_DATASOURCE_USERNAME:framecut}
+    password: ${SPRING_DATASOURCE_PASSWORD:framecut123}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -11,7 +11,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
+        format_sql: false
   thymeleaf:
     cache: true
     prefix: classpath:/templates/
@@ -22,17 +22,22 @@ server:
   servlet:
     session:
       timeout: 24h
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
 
 jwt:
-  secret: framecutSecretKey2024VeryLongAndSecureKeyForJWTSigningPurpose
+  secret: ${JWT_SECRET:framecutSecretKey2024VeryLongAndSecureKeyForJWTSigningPurpose}
   expiration: 86400000
 
 tmdb:
-  api-key: 4a6a57353f4c54fcd1506b2e15df190a
+  api-key: ${TMDB_API_KEY:4a6a57353f4c54fcd1506b2e15df190a}
   base-url: https://api.themoviedb.org/3
   image-base-url: https://image.tmdb.org/t/p
-  fetch-on-startup: true
-  pages-per-run: 50
+  fetch-on-startup: ${TMDB_FETCH_ON_STARTUP:true}
+  pages-per-run: ${TMDB_PAGES_PER_RUN:50}
 
 logging:
   level:

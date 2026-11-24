@@ -3,10 +3,12 @@ package com.framecut.controller;
 import com.framecut.dto.AuthRequest;
 import com.framecut.dto.RegisterRequest;
 import com.framecut.service.AuthService;
-import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,6 +31,7 @@ public class AuthController {
     @PostMapping("/login")
     public String login(@Valid @ModelAttribute AuthRequest request,
                         BindingResult result,
+                        HttpServletRequest httpRequest,
                         HttpServletResponse response,
                         Model model,
                         RedirectAttributes redirectAttributes) {
@@ -37,11 +40,15 @@ public class AuthController {
         }
         try {
             String token = authService.login(request);
-            Cookie cookie = new Cookie("jwt", token);
-            cookie.setHttpOnly(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(86400); // 24 hours
-            response.addCookie(cookie);
+            boolean isSecure = httpRequest.isSecure() || "https".equalsIgnoreCase(httpRequest.getHeader("X-Forwarded-Proto"));
+            ResponseCookie cookie = ResponseCookie.from("jwt", token)
+                .httpOnly(true)
+                .secure(isSecure)
+                .path("/")
+                .maxAge(86400) // 24 hours
+                .sameSite("Lax")
+                .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
             return "redirect:/";
         } catch (Exception e) {
             model.addAttribute("error", "Invalid username or password");
@@ -63,13 +70,9 @@ public class AuthController {
         if (result.hasErrors()) {
             return "auth/register";
         }
-        if (!request.getPassword().equals(request.getPassword())) {
-            model.addAttribute("error", "Passwords do not match");
-            return "auth/register";
-        }
         try {
             authService.register(request);
-            redirectAttributes.addFlashAttribute("success", "Account created! Please log in.");
+            redirectAttributes.addFlashAttribute("successParam", true);
             return "redirect:/auth/login";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
@@ -78,12 +81,16 @@ public class AuthController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletResponse response) {
-        Cookie cookie = new Cookie("jwt", "");
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+    public String logout(HttpServletRequest httpRequest, HttpServletResponse response) {
+        boolean isSecure = httpRequest.isSecure() || "https".equalsIgnoreCase(httpRequest.getHeader("X-Forwarded-Proto"));
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+            .httpOnly(true)
+            .secure(isSecure)
+            .path("/")
+            .maxAge(0)
+            .sameSite("Lax")
+            .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return "redirect:/";
     }
 }
