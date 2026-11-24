@@ -111,11 +111,16 @@ document.querySelectorAll('.row-arrow').forEach(btn => {
   if (!input || !results) return;
 
   let debounceTimer;
-  let currentRequest = null;
+  let abortController = null;
 
   input.addEventListener('input', () => {
     const q = input.value.trim();
     clearTimeout(debounceTimer);
+
+    if (abortController) {
+      abortController.abort();
+      abortController = null;
+    }
 
     if (q.length < 2) {
       results.classList.remove('show');
@@ -124,8 +129,11 @@ document.querySelectorAll('.row-arrow').forEach(btn => {
     }
 
     debounceTimer = setTimeout(async () => {
+      abortController = new AbortController();
       try {
-        const res = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(q)}`);
+        const res = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(q)}`, {
+          signal: abortController.signal
+        });
         const data = await res.json();
 
         if (!data.length) {
@@ -149,9 +157,11 @@ document.querySelectorAll('.row-arrow').forEach(btn => {
 
         results.classList.add('show');
       } catch (e) {
-        console.error('Autocomplete error:', e);
+        if (e.name !== 'AbortError') {
+          console.error('Autocomplete error:', e);
+        }
       }
-    }, 300);
+    }, 200);
   });
 
   // Enter key → search page
@@ -441,6 +451,18 @@ document.addEventListener('DOMContentLoaded', () => {
     closeTimer = setTimeout(() => {
       hidePreview();
     }, 200);
+  });
+
+  // Clicking anywhere on the hover card navigates directly to the movie/show page
+  hoverCard.addEventListener('click', (e) => {
+    const targetAnchor = e.target.closest('a');
+    if (targetAnchor && targetAnchor.getAttribute('href') && targetAnchor.getAttribute('href') !== '#') {
+      return; // Link handles standard click
+    }
+    const href = playBtn.getAttribute('href');
+    if (href && href !== '#' && href !== '') {
+      window.location.href = href;
+    }
   });
 
   window.addEventListener('scroll', () => {

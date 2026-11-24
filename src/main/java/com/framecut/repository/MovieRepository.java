@@ -45,7 +45,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     @Query("SELECT m FROM Movie m WHERE " +
            "(LOWER(m.title) LIKE LOWER(CONCAT('%', :query, '%'))) AND " +
-           "(:type IS NULL OR m.type = :type)")
+           "(:type IS NULL OR m.type = :type) " +
+           "ORDER BY m.popularity DESC, m.voteCount DESC")
     List<Movie> searchForAutocomplete(@Param("query") String query, @Param("type") String type, Pageable pageable);
 
     @Query("SELECT m FROM Movie m WHERE LOWER(m.title) LIKE LOWER(CONCAT('%', :query, '%'))")
@@ -61,8 +62,9 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
            "m.type = :type")
     Page<Movie> findByGenreAndType(@Param("genre") String genre, @Param("type") String type, Pageable pageable);
 
-    @Query("SELECT m FROM Movie m WHERE m.posterPath IS NOT NULL AND m.posterPath != '' AND m.popularity >= 5.0 AND " +
-           "(:query IS NULL OR LOWER(m.title) LIKE LOWER(CONCAT('%', :query, '%'))) AND " +
+    @Query("SELECT m FROM Movie m WHERE " +
+           "(:query IS NOT NULL OR (m.posterPath IS NOT NULL AND m.posterPath != '' AND m.popularity >= 3.0)) AND " +
+           "(:query IS NULL OR (LOWER(m.title) LIKE LOWER(CONCAT('%', :query, '%')) OR LOWER(m.overview) LIKE LOWER(CONCAT('%', :query, '%')))) AND " +
            "(:type IS NULL OR m.type = :type) AND " +
            "(:yearFrom IS NULL OR m.releaseYear >= :yearFrom) AND " +
            "(:yearTo IS NULL OR m.releaseYear <= :yearTo) AND " +

@@ -220,17 +220,49 @@
     </section>
 
     <!-- ===== EXPLORE BY GENRE ===== -->
-    <section class="section">
+    <section class="section" id="genres-section">
       <div class="section-header">
         <h2 class="section-title">Explore by Genre</h2>
       </div>
       <div class="genre-grid container">
         <a th:each="genre : ${genres}"
            th:href="@{/genres/{g}(g=${genre})}"
-           class="genre-tile">
+           class="genre-tile"
+           th:attr="data-genre=${#strings.toLowerCase(genre)}">
           <div class="genre-tile-bg"></div>
           <div class="genre-tile-overlay"></div>
-          <span class="genre-tile-name" th:text="${genre}">Genre</span>
+          <div class="genre-tile-glow"></div>
+          <div class="genre-tile-content">
+            <span class="genre-tile-icon" th:switch="${#strings.toLowerCase(genre)}">
+              <span th:case="'action'">⚡</span>
+              <span th:case="'action & adventure'">🏹</span>
+              <span th:case="'adventure'">🧭</span>
+              <span th:case="'animation'">🎨</span>
+              <span th:case="'comedy'">🎭</span>
+              <span th:case="'crime'">🕶️</span>
+              <span th:case="'documentary'">📽️</span>
+              <span th:case="'drama'">👑</span>
+              <span th:case="'family'">🎈</span>
+              <span th:case="'fantasy'">🔮</span>
+              <span th:case="'history'">🏛️</span>
+              <span th:case="'horror'">💀</span>
+              <span th:case="'kids'">🎠</span>
+              <span th:case="'music'">🎵</span>
+              <span th:case="'mystery'">🔍</span>
+              <span th:case="'romance'">💖</span>
+              <span th:case="'science fiction'">🚀</span>
+              <span th:case="'sci-fi & fantasy'">🛸</span>
+              <span th:case="'thriller'">🔥</span>
+              <span th:case="'war'">⚔️</span>
+              <span th:case="'war & politics'">🛡️</span>
+              <span th:case="'western'">🤠</span>
+              <span th:case="*">🎬</span>
+            </span>
+            <div class="genre-tile-info">
+              <span class="genre-tile-name" th:text="${genre}">Genre</span>
+              <span class="genre-tile-sub">Explore collection →</span>
+            </div>
+          </div>
         </a>
       </div>
     </section>

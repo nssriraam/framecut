@@ -1,15 +1,15 @@
 package com.framecut.scheduler;
 
+import com.framecut.entity.SyncState;
 import com.framecut.repository.MovieRepository;
+import com.framecut.repository.SyncStateRepository;
 import com.framecut.service.TmdbService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 @RequiredArgsConstructor
@@ -18,15 +18,13 @@ public class TmdbSyncScheduler {
 
     private final TmdbService tmdbService;
     private final MovieRepository movieRepository;
+    private final SyncStateRepository syncStateRepository;
 
     @Value("${tmdb.fetch-on-startup}")
     private boolean fetchOnStartup;
 
     @Value("${tmdb.pages-per-run}")
     private int pagesPerRun;
-
-    private final AtomicInteger moviePageOffset = new AtomicInteger(1);
-    private final AtomicInteger tvPageOffset = new AtomicInteger(1);
 
     @PostConstruct
     public void onStartup() {
@@ -38,6 +36,8 @@ public class TmdbSyncScheduler {
                     initialSync();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
+                } catch (Exception e) {
+                    log.error("Error in initial TMDB sync: {}", e.getMessage(), e);
                 }
             });
             thread.setDaemon(true);
@@ -48,46 +48,60 @@ public class TmdbSyncScheduler {
 
     private void initialSync() {
         long existing = movieRepository.count();
+        // Always sync trending & current theater/OTT releases first
+        try {
+            tmdbService.fetchTrendingAndNewReleases();
+        } catch (Exception e) {
+            log.warn("Trending fetch on startup notice: {}", e.getMessage());
+        }
+
         if (existing < 1000) {
-            log.info("DB has {} records. Starting bulk fetch...", existing);
-            // Fetch first 100 pages of movies and TV (2000 records each = 4000 total first run)
+            log.info("DB has {} records. Starting bulk fetch of first 100 pages...", existing);
             tmdbService.fetchMovies(1, 100);
             tmdbService.fetchSeries(1, 100);
-            log.info("Initial sync complete. Total records: {}", movieRepository.count());
-            moviePageOffset.set(101);
-            tvPageOffset.set(101);
+            syncStateRepository.save(new SyncState(1L, 101, 101));
+            log.info("Initial bulk sync complete. Total records: {}", movieRepository.count());
         } else {
-            log.info("DB already has {} records. Skipping bulk fetch.", existing);
-            int nextMoviePage = 200;
-            int nextTvPage = 200;
-            moviePageOffset.set(nextMoviePage);
-            tvPageOffset.set(nextTvPage);
+            log.info("DB already has {} records. Ready for scheduled sync cycles.", existing);
+            if (!syncStateRepository.existsById(1L)) {
+                syncStateRepository.save(new SyncState(1L, 101, 101));
+            }
         }
     }
 
-    // Runs every 6 hours to fetch more movies
-    @Scheduled(fixedDelay = 21600000, initialDelay = 600000)
+    // Runs every 6 hours (and 5 minutes after launch)
+    @Scheduled(fixedDelay = 21600000, initialDelay = 300000)
     public void scheduledSync() {
-        int movieStart = moviePageOffset.get();
-        if (movieStart > 500) {
-            log.info("Movie sync reached TMDB page 500 limit. Skipping background fetch.");
-        } else {
+        log.info("Running automatic scheduled TMDB sync...");
+        try {
+            // 1. Fetch latest trending & new releases (captures latest 2026 releases & OTT debuts)
+            tmdbService.fetchTrendingAndNewReleases();
+
+            // 2. Fetch progressive catalog pages tracked in database
+            SyncState state = syncStateRepository.findById(1L)
+                .orElse(new SyncState(1L, 1, 1));
+
+            int movieStart = state.getMoviePage();
+            int tvStart = state.getTvPage();
+
+            // Cycle back to 1 when reaching page 500 to keep library refreshed
+            if (movieStart > 500) movieStart = 1;
+            if (tvStart > 500) tvStart = 1;
+
             int movieEnd = Math.min(movieStart + pagesPerRun - 1, 500);
-            log.info("Scheduled sync: fetching movie pages {}-{}", movieStart, movieEnd);
-            tmdbService.fetchMovies(movieStart, movieEnd);
-            moviePageOffset.set(movieEnd + 1);
-        }
-
-        int tvStart = tvPageOffset.get();
-        if (tvStart > 500) {
-            log.info("TV sync reached TMDB page 500 limit. Skipping background fetch.");
-        } else {
             int tvEnd = Math.min(tvStart + pagesPerRun - 1, 500);
-            log.info("Scheduled sync: fetching tv pages {}-{}", tvStart, tvEnd);
-            tmdbService.fetchSeries(tvStart, tvEnd);
-            tvPageOffset.set(tvEnd + 1);
-        }
 
-        log.info("Scheduled sync done. Total records: {}", movieRepository.count());
+            log.info("Scheduled sync: fetching movie pages {}-{}, tv pages {}-{}", movieStart, movieEnd, tvStart, tvEnd);
+            tmdbService.fetchMovies(movieStart, movieEnd);
+            tmdbService.fetchSeries(tvStart, tvEnd);
+
+            state.setMoviePage(movieEnd >= 500 ? 1 : movieEnd + 1);
+            state.setTvPage(tvEnd >= 500 ? 1 : tvEnd + 1);
+            syncStateRepository.save(state);
+
+            log.info("Scheduled sync completed. Total records in DB: {}", movieRepository.count());
+        } catch (Exception e) {
+            log.error("Error during scheduled TMDB sync: {}", e.getMessage(), e);
+        }
     }
 }

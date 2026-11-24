@@ -83,9 +83,21 @@ public class MovieService {
     }
 
     public List<Movie> autocomplete(String query) {
-        if (query != null && !query.isBlank()) {
-            tmdbService.searchLive(query, 1);
+        if (query == null || query.isBlank()) {
+            return List.of();
         }
+        List<Movie> local = movieRepository.searchForAutocomplete(query, null, PageRequest.of(0, 8));
+        if (local.size() >= 3) {
+            // Instant return for cached/existing movies, update in background asynchronously
+            java.util.concurrent.CompletableFuture.runAsync(() -> {
+                try {
+                    tmdbService.searchLive(query, 1);
+                } catch (Exception ignored) {}
+            });
+            return local;
+        }
+        // If not in local DB or fewer than 3 results, search TMDB live to catch new releases (like Dorothy)
+        tmdbService.searchLive(query, 1);
         return movieRepository.searchForAutocomplete(query, null, PageRequest.of(0, 8));
     }
 

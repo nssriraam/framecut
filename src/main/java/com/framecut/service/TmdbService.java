@@ -161,41 +161,91 @@ public class TmdbService {
     public void searchLive(String query, int page) {
         if (query == null || query.isBlank()) return;
         try {
-            // Search Movies
-            Map<String, Object> movieResponse = getClient().get()
-                .uri(uriBuilder -> uriBuilder
-                    .path("/search/movie")
-                    .queryParam("api_key", apiKey)
-                    .queryParam("query", query)
-                    .queryParam("page", page)
-                    .build())
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
+            // Search Movies and TV concurrently for maximum performance
+            CompletableFuture<Void> movieSearch = CompletableFuture.runAsync(() -> {
+                try {
+                    Map<String, Object> movieResponse = getClient().get()
+                        .uri(uriBuilder -> uriBuilder
+                            .path("/search/movie")
+                            .queryParam("api_key", apiKey)
+                            .queryParam("query", query)
+                            .queryParam("page", page)
+                            .queryParam("include_adult", false)
+                            .build())
+                        .retrieve()
+                        .bodyToMono(Map.class)
+                        .block();
 
-            if (movieResponse != null && movieResponse.containsKey("results")) {
-                List<Map<String, Object>> results = (List<Map<String, Object>>) movieResponse.get("results");
-                for (Map<String, Object> item : results) saveMovie(item, "movie");
-            }
+                    if (movieResponse != null && movieResponse.containsKey("results")) {
+                        List<Map<String, Object>> results = (List<Map<String, Object>>) movieResponse.get("results");
+                        for (Map<String, Object> item : results) saveMovie(item, "movie");
+                    }
+                } catch (Exception e) {
+                    log.debug("Live movie search error for {}: {}", query, e.getMessage());
+                }
+            });
 
-            // Search TV Series
-            Map<String, Object> tvResponse = getClient().get()
-                .uri(uriBuilder -> uriBuilder
-                    .path("/search/tv")
-                    .queryParam("api_key", apiKey)
-                    .queryParam("query", query)
-                    .queryParam("page", page)
-                    .build())
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
+            CompletableFuture<Void> tvSearch = CompletableFuture.runAsync(() -> {
+                try {
+                    Map<String, Object> tvResponse = getClient().get()
+                        .uri(uriBuilder -> uriBuilder
+                            .path("/search/tv")
+                            .queryParam("api_key", apiKey)
+                            .queryParam("query", query)
+                            .queryParam("page", page)
+                            .queryParam("include_adult", false)
+                            .build())
+                        .retrieve()
+                        .bodyToMono(Map.class)
+                        .block();
 
-            if (tvResponse != null && tvResponse.containsKey("results")) {
-                List<Map<String, Object>> results = (List<Map<String, Object>>) tvResponse.get("results");
-                for (Map<String, Object> item : results) saveMovie(item, "tv");
-            }
+                    if (tvResponse != null && tvResponse.containsKey("results")) {
+                        List<Map<String, Object>> results = (List<Map<String, Object>>) tvResponse.get("results");
+                        for (Map<String, Object> item : results) saveMovie(item, "tv");
+                    }
+                } catch (Exception e) {
+                    log.debug("Live TV search error for {}: {}", query, e.getMessage());
+                }
+            });
+
+            CompletableFuture.allOf(movieSearch, tvSearch).join();
         } catch (Exception e) {
             log.error("Failed to perform live search for {}: {}", query, e.getMessage());
+        }
+    }
+
+    public void fetchTrendingAndNewReleases() {
+        log.info("Pulling latest trending, new releases, and on-air shows from TMDB...");
+        fetchEndpointPages("/trending/movie/week", "movie", 2);
+        fetchEndpointPages("/movie/now_playing", "movie", 2);
+        fetchEndpointPages("/trending/tv/week", "tv", 2);
+        fetchEndpointPages("/tv/on_the_air", "tv", 2);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void fetchEndpointPages(String path, String type, int maxPages) {
+        for (int p = 1; p <= maxPages; p++) {
+            final int pageNum = p;
+            try {
+                Map<String, Object> resp = getClient().get()
+                    .uri(uriBuilder -> uriBuilder
+                        .path(path)
+                        .queryParam("api_key", apiKey)
+                        .queryParam("page", pageNum)
+                        .build())
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+                if (resp != null && resp.containsKey("results")) {
+                    List<Map<String, Object>> results = (List<Map<String, Object>>) resp.get("results");
+                    for (Map<String, Object> item : results) {
+                        saveMovie(item, type);
+                    }
+                }
+                Thread.sleep(200);
+            } catch (Exception e) {
+                log.warn("Error fetching {} page {}: {}", path, pageNum, e.getMessage());
+            }
         }
     }
 
