@@ -1112,8 +1112,201 @@ footer .footer-logo span { color: var(--red); }
   margin-top: 0.5rem;
 }
 
+/* ===== PRIME VIDEO / NETFLIX STYLE HOVER PREVIEW CARD ===== */
+.prime-hover-card {
+  position: fixed;
+  z-index: 99999;
+  width: 320px;
+  background: #161412;
+  border: 1px solid rgba(211, 14, 23, 0.45);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(211, 14, 23, 0.28);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.92);
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.25s;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.prime-hover-card.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+.hover-card-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+.hover-card-media {
+  position: relative;
+  width: 100%;
+  height: 175px;
+  background: #25221e;
+  overflow: hidden;
+}
+
+.hover-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.prime-hover-card:hover .hover-card-media img {
+  transform: scale(1.04);
+}
+
+.hover-card-media-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, #161412 0%, rgba(22, 20, 18, 0.4) 50%, transparent 100%);
+}
+
+.hover-card-type-badge {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.75rem;
+  background: var(--red);
+  color: white;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.hover-card-body {
+  padding: 1rem 1.15rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: #161412;
+}
+
+.hover-card-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--cream);
+  line-height: 1.2;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hover-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.hover-btn-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--red);
+  color: white;
+  text-decoration: none;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.45rem 1.1rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px var(--red-glow);
+}
+
+.hover-btn-play:hover {
+  background: var(--red-dark);
+  transform: scale(1.03);
+}
+
+.hover-btn-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.hover-btn-icon:hover {
+  background: rgba(211, 14, 23, 0.2);
+  border-color: var(--red);
+  color: var(--red);
+  transform: scale(1.08);
+}
+
+.hover-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.hover-meta-rating {
+  color: #f5c842;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+}
+
+.hover-meta-year {
+  color: var(--cream-dark);
+  font-weight: 600;
+}
+
+.hover-meta-genres {
+  color: var(--text-secondary);
+  font-size: 12px;
+  background: rgba(255,255,255,0.05);
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.08);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.hover-card-overview {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--cream-dark);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: 0.85;
+}
+
 /* ===== MOBILE RESPONSIVE STYLES (SCOPED STRICTLY TO MOBILE DEVICES) ===== */
 @media (max-width: 768px) {
+  .prime-hover-card {
+    display: none !important;
+  }
   /* Navbar & Top Header */
   #navbar {
     padding: 0 1rem;

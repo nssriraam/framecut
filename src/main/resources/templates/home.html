@@ -49,7 +49,16 @@
         <div class="scroll-row">
           <a th:each="movie : ${trending}"
              th:href="@{/movies/{id}(id=${movie.id})}"
-             class="movie-card">
+             class="movie-card"
+             th:attr="data-id=${movie.id},
+                      data-title=${movie.title},
+                      data-poster=${movie.posterUrl},
+                      data-backdrop=${movie.backdropOrPoster},
+                      data-rating=${movie.voteAverage != null ? #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'},
+                      data-year=${movie.releaseYear},
+                      data-type=${movie.type},
+                      data-genres=${movie.firstTwoGenres},
+                      data-overview=${movie.shortOverview}">
             <img class="movie-card-poster"
                  th:src="${movie.posterUrl != null and !movie.posterUrl.isEmpty() ? movie.posterUrl : '/images/no-poster.jpg'}"
                  th:alt="${movie.title}"
@@ -88,7 +97,16 @@
         <div class="scroll-row">
           <a th:each="movie : ${newReleases}"
              th:href="@{/movies/{id}(id=${movie.id})}"
-             class="movie-card">
+             class="movie-card"
+             th:attr="data-id=${movie.id},
+                      data-title=${movie.title},
+                      data-poster=${movie.posterUrl},
+                      data-backdrop=${movie.backdropOrPoster},
+                      data-rating=${movie.voteAverage != null ? #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'},
+                      data-year=${movie.releaseYear},
+                      data-type=${movie.type},
+                      data-genres=${movie.firstTwoGenres},
+                      data-overview=${movie.shortOverview}">
             <img class="movie-card-poster"
                  th:src="${movie.posterUrl != null and !movie.posterUrl.isEmpty() ? movie.posterUrl : '/images/no-poster.jpg'}"
                  th:alt="${movie.title}"
@@ -123,7 +141,16 @@
         <div class="scroll-row">
           <a th:each="movie : ${topRated}"
              th:href="@{/movies/{id}(id=${movie.id})}"
-             class="movie-card">
+             class="movie-card"
+             th:attr="data-id=${movie.id},
+                      data-title=${movie.title},
+                      data-poster=${movie.posterUrl},
+                      data-backdrop=${movie.backdropOrPoster},
+                      data-rating=${movie.voteAverage != null ? #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'},
+                      data-year=${movie.releaseYear},
+                      data-type=${movie.type},
+                      data-genres=${movie.firstTwoGenres},
+                      data-overview=${movie.shortOverview}">
             <img class="movie-card-poster"
                  th:src="${movie.posterUrl != null and !movie.posterUrl.isEmpty() ? movie.posterUrl : '/images/no-poster.jpg'}"
                  th:alt="${movie.title}"
@@ -159,7 +186,16 @@
         <div class="scroll-row">
           <a th:each="movie : ${popularSeries}"
              th:href="@{/movies/{id}(id=${movie.id})}"
-             class="movie-card">
+             class="movie-card"
+             th:attr="data-id=${movie.id},
+                      data-title=${movie.title},
+                      data-poster=${movie.posterUrl},
+                      data-backdrop=${movie.backdropOrPoster},
+                      data-rating=${movie.voteAverage != null ? #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'},
+                      data-year=${movie.releaseYear},
+                      data-type=${movie.type},
+                      data-genres=${movie.firstTwoGenres},
+                      data-overview=${movie.shortOverview}">
             <img class="movie-card-poster"
                  th:src="${movie.posterUrl != null and !movie.posterUrl.isEmpty() ? movie.posterUrl : '/images/no-poster.jpg'}"
                  th:alt="${movie.title}"
@@ -207,7 +243,16 @@
       <div class="movie-grid" id="infinite-grid">
         <a th:each="movie : ${trending}"
            th:href="@{/movies/{id}(id=${movie.id})}"
-           class="movie-card">
+           class="movie-card"
+           th:attr="data-id=${movie.id},
+                    data-title=${movie.title},
+                    data-poster=${movie.posterUrl},
+                    data-backdrop=${movie.backdropOrPoster},
+                    data-rating=${movie.voteAverage != null ? #numbers.formatDecimal(movie.voteAverage,1,1) : 'N/A'},
+                    data-year=${movie.releaseYear},
+                    data-type=${movie.type},
+                    data-genres=${movie.firstTwoGenres},
+                    data-overview=${movie.shortOverview}">
           <img class="movie-card-poster"
                th:src="${movie.posterUrl != null and !movie.posterUrl.isEmpty() ? movie.posterUrl : '/images/no-poster.jpg'}"
                th:alt="${movie.title}"

@@ -229,6 +229,15 @@ function createMovieCard(movie, index) {
   card.href = `/movies/${movie.id}`;
   card.className = 'movie-card';
   card.style.animationDelay = `${(index % 20) * 0.04}s`;
+  card.setAttribute('data-id', movie.id);
+  card.setAttribute('data-title', movie.title || '');
+  card.setAttribute('data-poster', movie.poster || '');
+  card.setAttribute('data-backdrop', movie.backdrop || movie.poster || '');
+  card.setAttribute('data-rating', movie.rating ? movie.rating.toFixed(1) : 'N/A');
+  card.setAttribute('data-year', movie.year || '');
+  card.setAttribute('data-type', movie.type || 'movie');
+  card.setAttribute('data-genres', movie.genre || '');
+  card.setAttribute('data-overview', movie.overview || '');
   card.innerHTML = `
     <img class="movie-card-poster"
          src="${movie.poster}"
@@ -290,6 +299,150 @@ document.querySelectorAll('a[href]').forEach(link => {
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.page-wrapper')?.classList.add('page-transition-enter');
 });
+
+// Prime Video / Netflix Style Hover Preview Controller
+(function() {
+  const hoverCard = document.getElementById('prime-hover-card');
+  if (!hoverCard) return;
+
+  const cardImg = document.getElementById('hover-card-img');
+  const cardBadge = document.getElementById('hover-card-badge');
+  const cardTitle = document.getElementById('hover-card-title');
+  const playBtn = document.getElementById('hover-card-play-btn');
+  const infoBtn = document.getElementById('hover-card-info-btn');
+  const cardRating = document.getElementById('hover-card-rating');
+  const cardYear = document.getElementById('hover-card-year');
+  const cardGenres = document.getElementById('hover-card-genres');
+  const cardOverview = document.getElementById('hover-card-overview');
+
+  let openTimer = null;
+  let closeTimer = null;
+  let activeCard = null;
+
+  function showPreview(targetCard) {
+    if (!targetCard) return;
+    if (window.innerWidth <= 768) return;
+
+    activeCard = targetCard;
+
+    const href = targetCard.getAttribute('href') || '#';
+    const poster = targetCard.getAttribute('data-backdrop') ||
+                   targetCard.getAttribute('data-poster') ||
+                   targetCard.querySelector('.movie-card-poster')?.getAttribute('src') || '';
+    const title = targetCard.getAttribute('data-title') ||
+                  targetCard.querySelector('.movie-card-title')?.textContent ||
+                  targetCard.querySelector('.movie-card-bottom-title')?.textContent || 'Film';
+    let rating = targetCard.getAttribute('data-rating') ||
+                 targetCard.querySelector('.movie-card-rating')?.textContent || '★ N/A';
+    const year = targetCard.getAttribute('data-year') || '';
+    const type = targetCard.getAttribute('data-type') || (targetCard.textContent.includes('Series') ? 'tv' : 'movie');
+    let genres = targetCard.getAttribute('data-genres') ||
+                 targetCard.querySelector('.movie-card-bottom-meta')?.textContent || '';
+    const overview = targetCard.getAttribute('data-overview') ||
+                     'Click explore to view full cast, trailer, and community reviews.';
+
+    // Populate data
+    cardImg.src = poster;
+    cardTitle.textContent = title;
+    cardBadge.textContent = (type && type.toLowerCase().includes('tv')) ? 'SERIES' : 'MOVIE';
+
+    if (!rating.includes('★')) rating = '★ ' + rating;
+    cardRating.textContent = rating;
+
+    cardYear.textContent = year || '';
+    genres = genres.replace(/^[·\s\d]+/, '').replace(/^·\s*/, '').trim();
+    cardGenres.textContent = genres || 'Cinema';
+    cardOverview.textContent = overview;
+
+    playBtn.setAttribute('href', href);
+    infoBtn.setAttribute('href', href);
+
+    // Calculate dimensions & position over the hovered card
+    const rect = targetCard.getBoundingClientRect();
+    const cardWidth = 320;
+    const cardHeight = 350;
+
+    let left = rect.left + (rect.width / 2) - (cardWidth / 2);
+    let top = rect.top + (rect.height / 2) - (cardHeight / 2);
+
+    // Viewport collision bounds
+    if (left < 16) {
+      left = 16;
+    } else if (left + cardWidth > window.innerWidth - 16) {
+      left = window.innerWidth - cardWidth - 16;
+    }
+
+    if (top < 75) {
+      top = rect.top;
+      if (top < 75) top = 75;
+    } else if (top + cardHeight > window.innerHeight - 16) {
+      top = window.innerHeight - cardHeight - 16;
+    }
+
+    hoverCard.style.left = `${left}px`;
+    hoverCard.style.top = `${top}px`;
+    hoverCard.style.width = `${cardWidth}px`;
+
+    hoverCard.classList.add('visible');
+    hoverCard.setAttribute('aria-hidden', 'false');
+  }
+
+  function hidePreview() {
+    hoverCard.classList.remove('visible');
+    hoverCard.setAttribute('aria-hidden', 'true');
+    activeCard = null;
+  }
+
+  // Event Delegation for hover over .movie-card
+  document.addEventListener('mouseover', (e) => {
+    if (window.innerWidth <= 768) return;
+    const card = e.target.closest('.movie-card');
+    if (card) {
+      clearTimeout(closeTimer);
+      if (activeCard === card) return;
+      clearTimeout(openTimer);
+      openTimer = setTimeout(() => {
+        showPreview(card);
+      }, 300); // 300ms hover debounce
+    } else if (e.target.closest('#prime-hover-card')) {
+      clearTimeout(closeTimer);
+    }
+  });
+
+  document.addEventListener('mouseout', (e) => {
+    if (window.innerWidth <= 768) return;
+    const card = e.target.closest('.movie-card');
+    if (card) {
+      clearTimeout(openTimer);
+      closeTimer = setTimeout(() => {
+        hidePreview();
+      }, 200);
+    } else if (e.target.closest('#prime-hover-card')) {
+      closeTimer = setTimeout(() => {
+        hidePreview();
+      }, 200);
+    }
+  });
+
+  hoverCard.addEventListener('mouseenter', () => {
+    clearTimeout(closeTimer);
+  });
+  hoverCard.addEventListener('mouseleave', () => {
+    closeTimer = setTimeout(() => {
+      hidePreview();
+    }, 200);
+  });
+
+  window.addEventListener('scroll', () => {
+    if (activeCard) hidePreview();
+  }, { passive: true });
+
+  document.querySelectorAll('.scroll-row').forEach(row => {
+    row.addEventListener('scroll', () => {
+      if (activeCard) hidePreview();
+    }, { passive: true });
+  });
+})();
 
 // Mobile Navigation Toggle
 (function() {

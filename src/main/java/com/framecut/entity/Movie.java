@@ -99,6 +99,21 @@ public class Movie {
         return split[0].trim();
     }
 
+    public String getBackdropOrPoster() {
+        String backdrop = getBackdropUrlW1280();
+        return (backdrop != null && !backdrop.isBlank()) ? backdrop : getPosterUrl();
+    }
+
+    public String getShortOverview() {
+        if (overview == null || overview.isBlank()) {
+            return "Discover more about this title, cast, and community reviews on FrameCut.";
+        }
+        if (overview.length() > 140) {
+            return overview.substring(0, 137) + "...";
+        }
+        return overview;
+    }
+
     public double getAverageRating() {
         if (reviews == null || reviews.isEmpty()) return 0.0;
         return reviews.stream()
