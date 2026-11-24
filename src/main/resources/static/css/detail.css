@@ -388,3 +388,86 @@
   width: 1px; height: 30px;
   background: linear-gradient(to bottom, var(--red), transparent);
 }
+
+/* ===== MOBILE RESPONSIVE STYLES FOR DETAIL PAGE ===== */
+@media (max-width: 768px) {
+  .detail-title {
+    font-size: clamp(34px, 10vw, 56px);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .detail-hero-left {
+    padding: 1.5rem 1rem 1rem;
+  }
+  .detail-hero-right {
+    padding: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .meta-item {
+    flex: 1 1 90px;
+  }
+  .meta-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+  }
+  .meta-value {
+    font-size: 14px;
+  }
+  .detail-overview {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+  .detail-actions {
+    gap: 0.5rem;
+  }
+  .detail-actions .btn-red,
+  .detail-actions .btn-outline {
+    padding: 0.5rem 1rem;
+    font-size: 13px;
+  }
+  .detail-content {
+    padding: 2rem 1rem;
+  }
+  .reviews-section h2 {
+    font-size: 26px;
+  }
+  .review-form {
+    padding: 1rem;
+  }
+  .review-card {
+    padding: 1rem;
+  }
+  .cast-ribbon {
+    gap: 1rem !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .cast-card {
+    width: 85px !important;
+  }
+  #actor-modal .glass-modal-content {
+    width: 94% !important;
+    max-height: 85vh !important;
+    border-radius: 12px !important;
+  }
+  #actor-modal-body {
+    padding: 1.25rem 1rem !important;
+    gap: 1rem !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center;
+  }
+  #actor-modal-body img {
+    width: 120px !important;
+    height: 180px !important;
+  }
+  .trailer-close {
+    top: 1rem !important;
+    right: 1rem !important;
+    font-size: 28px !important;
+  }
+  .trailer-frame {
+    width: 95vw !important;
+    border-radius: 8px !important;
+  }
+}

@@ -242,6 +242,10 @@ body {
 }
 
 /* Search bar in nav */
+.nav-hamburger {
+  display: none;
+}
+
 .nav-search {
   position: relative;
   width: 280px;
@@ -1106,4 +1110,311 @@ footer .footer-logo span { color: var(--red); }
   font-size: 11px;
   color: var(--text-secondary);
   margin-top: 0.5rem;
+}
+
+/* ===== MOBILE RESPONSIVE STYLES (SCOPED STRICTLY TO MOBILE DEVICES) ===== */
+@media (max-width: 768px) {
+  /* Navbar & Top Header */
+  #navbar {
+    padding: 0 1rem;
+  }
+  .nav-inner {
+    gap: 0.75rem;
+    justify-content: space-between;
+  }
+  .nav-logo {
+    font-size: 24px;
+  }
+  .nav-right {
+    gap: 0.5rem;
+  }
+  .nav-search {
+    width: 140px;
+  }
+  .nav-search input {
+    font-size: 13px;
+    padding: 0.4rem 0.6rem 0.4rem 2rem;
+  }
+  .nav-search input:focus {
+    width: 155px;
+  }
+  .nav-search-icon {
+    left: 0.65rem;
+    font-size: 12px;
+  }
+  .autocomplete-results {
+    position: fixed;
+    top: calc(var(--nav-height) + 4px);
+    left: 1rem;
+    right: 1rem;
+    width: auto;
+    max-width: none;
+  }
+  .nav-auth-btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 12px;
+  }
+  .nav-avatar {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+  .user-dropdown {
+    position: fixed;
+    top: calc(var(--nav-height) + 4px);
+    right: 1rem;
+    left: auto;
+    min-width: 180px;
+  }
+
+  /* Hamburger Button */
+  .nav-hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1002;
+    flex-shrink: 0;
+  }
+  .nav-hamburger span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: var(--cream);
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.2s ease, background 0.2s ease;
+  }
+  .nav-hamburger:hover span,
+  .nav-hamburger.open span {
+    background: var(--red);
+  }
+  .nav-hamburger.open span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  .nav-hamburger.open span:nth-child(2) {
+    opacity: 0;
+  }
+  .nav-hamburger.open span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  /* Mobile Navigation Drawer */
+  .nav-links {
+    position: fixed;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    background: rgba(13, 12, 10, 0.98);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-bottom: 1px solid rgba(211, 14, 23, 0.3);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0.75rem 1.25rem 1.5rem;
+    display: none;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.85);
+    max-height: calc(100vh - var(--nav-height));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 999;
+  }
+  .nav-links.open {
+    display: flex;
+    animation: mobileNavSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes mobileNavSlide {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .nav-links li {
+    width: 100%;
+  }
+  .nav-links a {
+    display: block;
+    font-size: 16px;
+    padding: 0.8rem 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    width: 100%;
+  }
+  .nav-dropdown-toggle {
+    font-size: 16px;
+    padding: 0.8rem 0.5rem;
+    width: 100%;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .dropdown-menu {
+    display: none;
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    min-width: unset;
+    width: 100%;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 0.6rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    max-height: 220px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-dropdown.active .dropdown-menu {
+    display: grid;
+  }
+  .dropdown-menu a {
+    padding: 0.5rem 0.6rem;
+    font-size: 13px;
+    border-bottom: none;
+  }
+
+  /* Containers & Section Spacing */
+  .container {
+    padding: 0 1rem;
+  }
+  .scroll-row-wrapper {
+    padding: 0 1rem;
+  }
+  .section {
+    padding: 1.75rem 0;
+  }
+  .section-header {
+    padding: 0 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-size: 22px;
+  }
+  .see-all {
+    font-size: 13px;
+  }
+  .row-arrow {
+    display: none !important;
+  }
+
+  /* Movie Cards & Horizontal Scroll */
+  .scroll-row {
+    gap: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .movie-card {
+    width: 135px;
+  }
+  .movie-card-bottom-title {
+    font-size: 12px;
+  }
+  .movie-card-bottom-meta {
+    font-size: 10px;
+  }
+
+  /* Movie Grid - 2 columns on phones */
+  .movie-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 0 1rem;
+  }
+  .movie-grid .movie-card {
+    width: 100%;
+  }
+
+  /* Genre Grid - 2 columns on mobile */
+  .genre-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 0 1rem;
+  }
+  .genre-tile-name {
+    font-size: 14px;
+    bottom: 0.4rem;
+    left: 0.5rem;
+  }
+
+  /* Hero adjustments */
+  .hero {
+    height: auto;
+    min-height: 80vh;
+    min-height: 80svh;
+    padding: 5rem 1rem 2.5rem;
+  }
+  .hero-content {
+    padding: 0.5rem;
+  }
+  .hero-logo {
+    font-size: clamp(48px, 15vw, 76px);
+    text-shadow: 2px 2px 0 var(--red), 4px 4px 15px rgba(0,0,0,0.5);
+  }
+  .hero-tagline {
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    margin-bottom: 1.5rem;
+  }
+  .hero-cta {
+    padding: 0.75rem 1.75rem;
+    font-size: 15px;
+  }
+  .hero-scroll-hint {
+    display: none;
+  }
+
+  /* Footer */
+  footer {
+    padding: 2rem 1rem;
+    margin-top: 2.5rem;
+  }
+
+  /* Reviews & Profile */
+  .reviews-page-header {
+    padding: 1.5rem 1rem 1rem;
+  }
+  .reviews-page-title {
+    font-size: clamp(28px, 8vw, 42px);
+  }
+  .reviews-grid {
+    padding: 0 1rem;
+  }
+  .review-big-card {
+    max-height: none;
+    flex-direction: column;
+  }
+  .review-big-poster {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+  .review-big-body {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-search {
+    width: 110px;
+  }
+  .nav-search input {
+    font-size: 12px;
+    padding: 0.35rem 0.5rem 0.35rem 1.8rem;
+  }
+  .nav-search input:focus {
+    width: 135px;
+  }
+  .movie-card {
+    width: 125px;
+  }
+  .hero-logo {
+    font-size: clamp(42px, 14vw, 60px);
+  }
+  .btn-red, .btn-outline {
+    padding: 0.5rem 1.1rem;
+    font-size: 13px;
+  }
 }
